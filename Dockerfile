@@ -12,5 +12,5 @@ RUN pip install -r requirements.txt
 
 ADD . /code/
 
-RUN python /code/manage.py migrate
+# RUN python /code/manage.py migrate
 RUN python /code/manage.py collectstatic --no-input

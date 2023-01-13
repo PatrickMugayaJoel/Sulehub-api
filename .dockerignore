@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# virtualenv
+.venv
+venv/
+ENV/
+
+.git
+.gitignore
+
+#sqlite DB
+db.sqlite3
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+
+### VisualStudioCode template
+.vscode/
+
+# IDEA
+.idea/

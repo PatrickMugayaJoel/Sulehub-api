@@ -1,11 +1,36 @@
-version: "3"
+version: "3.7"
 
 services:
   shulehub_api:
+    depends_on:
+      - postgres
     build:
       context: .
       dockerfile: Dockerfile
-    command: python /code/manage.py runserver
-    restart: always
+    command: bash -c "python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8000"
+    restart: unless-stopped
     ports:
       - "8000:8000"
+    networks:
+      - bridge
+    environment:
+      - RUN_TIME=production
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+
+  postgres:
+    restart: unless-stopped
+    image: postgres:15
+    networks:
+      - bridge
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+
+networks:
+  bridge:
+    driver: bridge
