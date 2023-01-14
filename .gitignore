@@ -95,6 +95,8 @@ ENV/
 db.sqlite3
 # mkdocs documentation
 /site
+/static
+!/static/styles.css
 
 # mypy
 .mypy_cache/

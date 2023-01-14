@@ -19,6 +19,7 @@ from .serializers import (
     UserListSerializer
 )
 from app.utils import generate_jwt_token
+from core.email_service import send_email
 
 
 class RegistrationAPIView(CreateAPIView):
@@ -33,6 +34,12 @@ class RegistrationAPIView(CreateAPIView):
             if user_serializer.is_valid():
                 user = user_serializer.save()
                 data = generate_jwt_token(user, user_serializer.data)
+
+                send_email(
+                    recipient_list = [user.email,],
+                    request = request,
+                )
+
                 return Response(data, status=status.HTTP_200_OK)
             else:
                 message = ''

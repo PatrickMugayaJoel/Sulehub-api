@@ -9,7 +9,10 @@ class CustomLogger():
         self.logger = logging.getLogger("master_app")
         self.app = "master_app"
 
-    def log_info(self, request_id, message, http_method, api_path, data, app_name):
+    def log_info(self, request_id, message, request, app_name):
+        http_method = request.method
+        api_path = request.method
+        data = request.data
         
         logging.basicConfig(format='%(message)s', filename=self.app + '.log', level=logging.INFO)
         today = datetime.now()
@@ -21,8 +24,11 @@ class CustomLogger():
             self.logger.info(app_name.upper() + " " + request_id + " " + date_time + " " + http_method.upper() + " " + api_path + " " + message)
 
 
-    def log_debug(self, request_id, message, http_method, api_path, data, app_name):
-
+    def log_debug(self, request_id, message, request, app_name):
+        http_method = request.method
+        api_path = request.method
+        data = request.data
+        
         logging.basicConfig(format='%(message)s', filename=self.app + '.log', level=logging.DEBUG)
         today = datetime.now()
         date_time = today.strftime("%d/%m/%Y-%H:%M:%S")
@@ -33,7 +39,10 @@ class CustomLogger():
             self.logger.debug(app_name.upper() + " " + request_id + " " + date_time + " " + http_method.upper() + " " + api_path + " " + message)
 
 
-    def log_warning(self, request_id, message, http_method, api_path, data, app_name):
+    def log_warning(self, request_id, message, request, app_name):
+        http_method = request.method
+        api_path = request.method
+        data = request.data
         
         logging.basicConfig(format='%(message)s', filename=self.app + '.log', level=logging.WARNING)
         today = datetime.now()
@@ -45,7 +54,10 @@ class CustomLogger():
             self.logger.warning(app_name.upper() + " " + request_id + " " + date_time + " " + http_method.upper() + " " + api_path + " " + message)
 
 
-    def log_error(self, request_id, message, http_method, api_path, data, app_name):
+    def log_error(self, request_id, message, request, app_name):
+        http_method = request.method
+        api_path = request.method
+        data = request.data
         
         logging.basicConfig(format='%(message)s', filename=self.app + '.log', level=logging.ERROR)
         today = datetime.now()

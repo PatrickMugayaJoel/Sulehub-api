@@ -8,6 +8,10 @@ __pycache__/
 venv/
 ENV/
 
+
+/static
+!/static/styles.css
+
 .git
 .gitignore
 

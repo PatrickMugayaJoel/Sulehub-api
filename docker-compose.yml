@@ -15,11 +15,7 @@ services:
       - bridge
     environment:
       - RUN_TIME=production
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
       - DB_HOST=postgres
-      - DB_PORT=5432
 
   postgres:
     restart: unless-stopped
