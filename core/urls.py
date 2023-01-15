@@ -20,5 +20,6 @@ from django.urls import path, include
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
+    path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
                   path('api/v1.0/', include("app.urls", namespace="app-api")),
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -6,7 +6,7 @@ from django.contrib.auth import logout
 # Rest Framework imports
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView, CreateAPIView
+from rest_framework.generics import GenericAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_jwt.serializers import JSONWebTokenSerializer
@@ -16,10 +16,13 @@ from rest_framework_jwt.views import JSONWebTokenAPIView
 from .models import User
 from .serializers import (
     UserCreateSerializer, 
-    UserListSerializer
+    UserListSerializer,
+    ChangePasswordSerializer,
+    UserUpdateSerializer
 )
 from app.utils import generate_jwt_token
 from core.email_service import send_email
+from core.upload_service import upload
 
 
 class RegistrationAPIView(CreateAPIView):
@@ -38,6 +41,7 @@ class RegistrationAPIView(CreateAPIView):
                 send_email(
                     recipient_list = [user.email,],
                     request = request,
+                    template = "USER_CREATION",
                 )
 
                 return Response(data, status=status.HTTP_200_OK)
@@ -53,7 +57,6 @@ class RegistrationAPIView(CreateAPIView):
             return Response({'status': False,
                              'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
-
 
 class LoginView(JSONWebTokenAPIView):
     serializer_class = JSONWebTokenSerializer
@@ -84,7 +87,6 @@ class LoginView(JSONWebTokenAPIView):
                              'message': "User does not exist"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -103,10 +105,9 @@ class LogoutView(APIView):
             return Response({'status': False},
                             status=status.HTTP_400_BAD_REQUEST)
 
-
 class UserAPIView(GenericAPIView):
     serializer_class = UserListSerializer
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         """
@@ -123,3 +124,83 @@ class UserAPIView(GenericAPIView):
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
+
+class UserDPUploadView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    __doc__ = "Profile Update API for user"
+
+    @staticmethod
+    def post(request):
+        try:
+            if not request.FILES.get('file'):
+                raise ObjectDoesNotExist("'Request File' object is empty")
+            filepath = "uploads/pictures/profiles/" + str(request.FILES['file'])
+            if upload(request, filepath):
+                request.user.DP=filepath
+                request.user.save()
+                return Response({'status': True,
+                                'message': "image successfully uploaded",
+                                'path':filepath},
+                                status=status.HTTP_200_OK)
+            else:
+                return Response({'status': False}, status=status.HTTP_400_BAD_REQUEST)
+        except (AttributeError, ObjectDoesNotExist) as e:
+            return Response({'status': False,
+                            'message': str(e),},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateAPIView(UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    model = User
+    serializer_class = UserUpdateSerializer
+    # serializer_class = UserCreateSerializer
+
+    __doc__ = "Profile Update API for user"
+
+    def update(self, request, *args, **kwargs):
+        try:
+            user = self.request.user
+            user_serializer = self.serializer_class(user, data=request.data)
+            if user_serializer.is_valid():
+                user_serializer.save()
+                send_email(request=request, template="USER_UPDATE",)
+                return Response(user_serializer.data, status=status.HTTP_200_OK)
+            else:
+                message = ''
+                for error in user_serializer.errors.values():
+                    message += " "
+                    message += error[0]
+                return Response({'status': False,
+                                 'message': message},
+                                status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'status': False,
+                             'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class ChangePasswordView(UpdateAPIView):
+    serializer_class = ChangePasswordSerializer
+    model = User
+    permission_classes = (IsAuthenticated,)
+
+    __doc__ = "An endpoint for changing password."
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.request.user
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+
+            return Response({'status': True,
+                'message': 'Password updated successfully'
+                }, status=status.HTTP_200_OK
+            )
+
+        return Response({'status': False, 'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)

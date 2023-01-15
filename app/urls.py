@@ -10,6 +10,6 @@ from app.swagger import schema_view
 app_name = 'app'
 
 urlpatterns = [
-    path('users/', include("users.urls", namespace="users-api")),
+    path('users/', include("users.urls", namespace="users_api")),
     path('docs/', schema_view.with_ui("swagger", cache_timeout=0), name="schema_view"),
 ]
