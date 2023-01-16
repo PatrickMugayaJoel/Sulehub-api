@@ -41,7 +41,7 @@ class RegistrationAPIView(CreateAPIView):
                 send_email(
                     recipient_list = [user.email,],
                     request = request,
-                    template = "USER_CREATION",
+                    template = "USER_CREATED",
                 )
 
                 return Response(data, status=status.HTTP_200_OK)
@@ -105,11 +105,28 @@ class LogoutView(APIView):
             return Response({'status': False},
                             status=status.HTTP_400_BAD_REQUEST)
 
-class UserAPIView(GenericAPIView):
+class GetUserAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
     serializer_class = UserListSerializer
-    # permission_classes = (IsAuthenticated,)
+    queryset = User.objects.all()
 
-    def get(self, request, format=None):
+    __doc__ = "Get User Profile"
+
+    def get(self, request, user_id=None):
+        try:
+            user = self.queryset.get(pk=int(user_id))
+            user_serializer = self.serializer_class(user)
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False,
+                             'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class UserAPIView(APIView):
+    serializer_class = UserListSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
         """
         List all the users.
         """
@@ -164,7 +181,7 @@ class UpdateAPIView(UpdateAPIView):
             user_serializer = self.serializer_class(user, data=request.data)
             if user_serializer.is_valid():
                 user_serializer.save()
-                send_email(request=request, template="USER_UPDATE",)
+                send_email(request=request, template="USER_UPDATED",)
                 return Response(user_serializer.data, status=status.HTTP_200_OK)
             else:
                 message = ''
