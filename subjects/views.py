@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 # local imports
 from .models import Subject
 from .serializers import SubjectSerializer, SubjectUpdateSerializer
-from core.email_service import send_email
 from core.upload_service import upload
 
 
@@ -17,6 +16,7 @@ class ListSubjectsView(APIView):
     queryset = Subject.objects.all()
     permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(tags=["Subjects"])
     def get(self, request):
         """
         List all subjects.
@@ -30,6 +30,26 @@ class ListSubjectsView(APIView):
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
+## TODO: 
+# class ListTeacherStudentssView(APIView):
+#     serializer_class = SubjectSerializer
+#     queryset = Subject.objects.all()
+#     permission_classes = (IsAuthenticated,)
+
+#     @swagger_auto_schema(tags=["Teacher"])
+#     def get(self, request, school_id, teacher_id):
+#         """
+#         List all the Teacher's sudents.
+#         """
+#         try:
+#             subjects = self.queryset.filter(school=school_id, teacher=teacher_id)
+#             subject_serializer = self.serializer_class(subjects, many=True)
+#             return Response({'status': True,
+#                              'Response': subject_serializer.data},
+#                             status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({'status': False, 'message': str(e)},
+#                             status=status.HTTP_400_BAD_REQUEST)
 
 class GetSubjectView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -38,6 +58,7 @@ class GetSubjectView(APIView):
 
     __doc__ = "GET API for subject"
 
+    @swagger_auto_schema(tags=["Subjects"])
     def get(self, request, subject_id=None):
         try:
             subject = self.queryset.get(pk=int(subject_id))
@@ -58,14 +79,14 @@ class AddSubjectView(APIView):
     @swagger_auto_schema(
         operation_description="Create API for subject",
         request_body=SubjectSerializer,
-        #  responses={200: 'slug not found'}
+        tags=["Subjects"]
     )
     def post(self, request):
         try:
             subject_serializer = self.serializer_class(data=request.data)
             if subject_serializer.is_valid():
                 subject_serializer.save()
-                return Response({'status': True, 'message': subject_serializer.data}, status=status.HTTP_200_OK)
+                return Response({'status': True, 'message': subject_serializer.data}, status.HTTP_201_CREATED)
             else:
                 message = ''
                 for error in subject_serializer.errors.values():
@@ -86,7 +107,7 @@ class UpdateSubjectView(APIView):
 
     __doc__ = "Profile Update API for subject"
 
-    @swagger_auto_schema(request_body=SubjectSerializer,)
+    @swagger_auto_schema(request_body=SubjectSerializer,tags=["Subjects"],)
     def put(self, request, subject_id=None):
         try:
             subject = self.queryset.get(pk=int(subject_id))

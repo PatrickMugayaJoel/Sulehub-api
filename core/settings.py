@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'users',
-    'schools'
+    'schools',
+    'subjects'
 ]
 
 MIDDLEWARE = [

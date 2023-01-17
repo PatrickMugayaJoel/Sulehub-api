@@ -17,6 +17,7 @@ class ListSchoolsView(APIView):
     queryset = School.objects.all()
     permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(tags=["Schools"])
     def get(self, request):
         """
         List all schools.
@@ -38,6 +39,7 @@ class GetSchoolView(APIView):
 
     __doc__ = "GET API for school"
 
+    @swagger_auto_schema(tags=["Schools"])
     def get(self, request, school_id=None):
         try:
             school = self.queryset.get(pk=int(school_id))
@@ -58,7 +60,7 @@ class AddSchoolView(APIView):
     @swagger_auto_schema(
         operation_description="Create API for school",
         request_body=SchoolSerializer,
-        #  responses={200: 'slug not found'}
+        tags=["Schools"]
     )
     def post(self, request):
         try:
@@ -87,7 +89,7 @@ class UpdateSchoolView(APIView):
 
     __doc__ = "Profile Update API for school"
 
-    @swagger_auto_schema(request_body=SchoolSerializer,)
+    @swagger_auto_schema(request_body=SchoolSerializer,tags=["Schools"])
     def put(self, request, school_id=None):
         try:
             school = self.queryset.get(pk=int(school_id))
@@ -115,6 +117,7 @@ class SchoolsDPView(APIView):
 
     __doc__ = "Update school display picture"
 
+    @swagger_auto_schema(tags=["Schools"])
     def post(self, request, school_id=None):
         try:
             school = self.queryset.get(pk=int(school_id))
