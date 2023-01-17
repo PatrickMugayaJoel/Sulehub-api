@@ -27,7 +27,3 @@ class School(models.Model):
     class Meta:
         verbose_name = _('school')
         verbose_name_plural = _('schools')
-
-    def __str__(self):
-        return self.email
-

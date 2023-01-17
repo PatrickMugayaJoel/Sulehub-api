@@ -29,4 +29,4 @@ class SchoolUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = School
-        fields = ('school_id', 'name', 'phone', 'email', 'website', 'country', 'address', 'Bio', 'school_id', 'manager')
+        fields = ('name', 'phone', 'email', 'website', 'country', 'address', 'Bio', 'manager')
