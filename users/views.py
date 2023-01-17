@@ -145,7 +145,7 @@ class UserAPIView(APIView):
 class UserDPUploadView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    __doc__ = "Profile Update API for user"
+    __doc__ = "Update user display picture"
 
     @staticmethod
     def post(request):
@@ -171,7 +171,6 @@ class UpdateAPIView(UpdateAPIView):
     permission_classes = (IsAuthenticated,)
     model = User
     serializer_class = UserUpdateSerializer
-    # serializer_class = UserCreateSerializer
 
     __doc__ = "Profile Update API for user"
 

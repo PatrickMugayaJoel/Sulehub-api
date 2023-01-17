@@ -1,5 +1,5 @@
 
-def messages(template, **kargs) = {
+def messages(template, **kargs):
     templates = {
         "USER_UPDATED":{
             "subject":"User information updated",
@@ -10,6 +10,4 @@ def messages(template, **kargs) = {
             "message":"""Your user account was successfully created."""
         }
     }
-
     return templates.get(template)
-}

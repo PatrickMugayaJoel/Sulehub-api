@@ -6,7 +6,7 @@ from drf_yasg.views import get_schema_view
 # Swagger test API
 schema_view = get_schema_view(
         openapi.Info(
-        title="Rest Swagger", default_version="v1", description="Shulehub API"
+        title="Shulehub API Docs", default_version="v1", description="Shulehub API"
         ),
         public=True,
         permission_classes=(permissions.AllowAny,),
