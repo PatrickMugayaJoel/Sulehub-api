@@ -15,7 +15,7 @@ from core.upload_service import upload
 class ListSchoolsView(APIView):
     serializer_class = SchoolSerializer
     queryset = School.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     @swagger_auto_schema(tags=["Schools"])
     def get(self, request):
@@ -33,7 +33,7 @@ class ListSchoolsView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
 class GetSchoolView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = School.objects.all()
     serializer_class = SchoolSerializer
 

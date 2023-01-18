@@ -17,7 +17,7 @@ class Subject(models.Model):
     level = models.CharField(max_length=30, blank=True)
     description = models.TextField(blank=True)
     teacher = models.ForeignKey(User, to_field='id', null=True, on_delete=models.SET_NULL) # TODO: show more than an id
-    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE)
+    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE) # TODO: show more than an id
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
 
@@ -29,9 +29,10 @@ class Subject(models.Model):
 ## Teachers
 #############################################
 class TeacherRegistration(models.Model):
-    id = models.AutoField(primary_key=True)
-    teacher = models.ForeignKey(User, to_field='id', on_delete=models.CASCADE)
-    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE)
+    reg_id = models.AutoField(primary_key=True)
+    teacher = models.ForeignKey(User, to_field='id', on_delete=models.CASCADE) # TODO: show more than an id
+    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE) # TODO: show more than an id
+    is_active = models.BooleanField(default=True)
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
 
@@ -41,11 +42,12 @@ class TeacherRegistration(models.Model):
 ## Students
 #############################################
 class StudentRegistration(models.Model):
-    id = models.AutoField(primary_key=True)
-    student = models.ForeignKey(User, to_field='id', on_delete=models.CASCADE)
-    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE)
+    reg_id = models.AutoField(primary_key=True)
+    student = models.ForeignKey(User, to_field='id', on_delete=models.CASCADE) # TODO: show more than an id
+    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE) # TODO: show more than an id
     level = models.CharField(max_length=30)
     academic_year = models.CharField(_("Academic Year"), max_length=30, null=True)
+    is_active = models.BooleanField(default=True)
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
     ## Currently, students automatically takes on all subjects in the level that he/she registers to
