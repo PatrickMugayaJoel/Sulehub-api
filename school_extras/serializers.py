@@ -39,7 +39,7 @@ class TeachersSerializer(serializers.ModelSerializer):
 class TeachersUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, data, *args, **kwargs):
-       return super(TeachersSerializer, self).validate(data, *args, **kwargs)
+       return super(TeachersUpdateSerializer, self).validate(data, *args, **kwargs)
 
     def update(self, instance, validated_data):
         instance.is_active = validated_data['is_active']

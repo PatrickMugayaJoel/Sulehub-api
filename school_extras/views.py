@@ -190,7 +190,7 @@ class UpdateTeacherView(APIView):
     def put(self, request, teacher_reg_id):
         try:
             school_teachers = TeacherRegistration.objects.get(pk=teacher_reg_id)
-            teacher_serializer = TeachersSerializer(school_teachers, data=request.data, many=False)
+            teacher_serializer = TeachersUpdateSerializer(school_teachers, data=request.data, many=False)
             if teacher_serializer.is_valid():
                 teacher_serializer.save()
             return Response({'status': True, 'Response': teacher_serializer.data}, status=status.HTTP_200_OK)
@@ -238,9 +238,9 @@ class ListStudentSubjectsView(APIView):
     __doc__ = "List a Student's subjects in a specific school."
 
     @swagger_auto_schema(tags=["Students"])
-    def get(self, request, school_id, students_reg_id):
+    def get(self, request, school_id, student_reg_id):
         try:
-            student_reg_obj = TeacherRegistration.objects.get(pk=int(students_reg_id))
+            student_reg_obj = StudentRegistration.objects.get(pk=int(student_reg_id))
             if not (student_reg_obj and student_reg_obj.is_active):
                 return Response({'status': True, 'Response': []}, status=status.HTTP_200_OK)
             student_subjects = Subject.objects.filter(school=school_id, level=student_reg_obj.level)

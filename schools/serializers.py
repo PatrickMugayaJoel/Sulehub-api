@@ -8,7 +8,8 @@ from .models import School
 class SchoolSerializer(serializers.ModelSerializer):
     class Meta:
         model = School
-        fields = ('school_id', 'name', 'phone', 'email', 'website', 'country', 'address', 'Bio', 'school_id', 'manager')
+        fields = ('school_id', 'name', 'phone', 'email', 'website', 'country', 'address', 'Bio', 'school_id', 'manager', 'DP')
+        extra_kwargs = {'DP':{'read_only':True},}
 
 class SchoolUpdateSerializer(serializers.ModelSerializer):
 
