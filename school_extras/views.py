@@ -6,11 +6,14 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # local imports
-from .models import Subject
+from .models import Subject, TeacherRegistration, StudentRegistration
 from .serializers import SubjectSerializer, SubjectUpdateSerializer
 from core.upload_service import upload
 
 
+#############################################
+## Subjects
+#############################################
 class ListSubjectsView(APIView):
     serializer_class = SubjectSerializer
     queryset = Subject.objects.all()
@@ -30,26 +33,6 @@ class ListSubjectsView(APIView):
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
-## TODO: 
-# class ListTeacherStudentssView(APIView):
-#     serializer_class = SubjectSerializer
-#     queryset = Subject.objects.all()
-#     permission_classes = (IsAuthenticated,)
-
-#     @swagger_auto_schema(tags=["Teacher"])
-#     def get(self, request, school_id, teacher_id):
-#         """
-#         List all the Teacher's sudents.
-#         """
-#         try:
-#             subjects = self.queryset.filter(school=school_id, teacher=teacher_id)
-#             subject_serializer = self.serializer_class(subjects, many=True)
-#             return Response({'status': True,
-#                              'Response': subject_serializer.data},
-#                             status=status.HTTP_200_OK)
-#         except Exception as e:
-#             return Response({'status': False, 'message': str(e)},
-#                             status=status.HTTP_400_BAD_REQUEST)
 
 class GetSubjectView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -100,7 +83,6 @@ class AddSubjectView(APIView):
                              'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
-class UpdateSubjectView(APIView):
     permission_classes = (IsAuthenticated,)
     queryset = Subject.objects.all()
     serializer_class = SubjectUpdateSerializer
@@ -127,3 +109,40 @@ class UpdateSubjectView(APIView):
             return Response({'status': False,
                              'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
+
+#############################################
+## Teachers
+#############################################
+# ListTeachersView,
+# AddTeacherView,
+# UpdateTeacherView,
+# ListTeacherStudentsView,
+# ListTeacherSubjectsView,
+class ListTeacherStudentssView(APIView):
+    serializer_class = SubjectSerializer
+    queryset = Subject.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    @swagger_auto_schema(tags=["Teacher"])
+    def get(self, request, school_id, teacher_id):
+        """
+        List all the Teacher's sudents.
+        """
+        try:
+            subjects = self.queryset.filter(school=school_id, teacher=teacher_id)
+            subject_serializer = self.serializer_class(subjects, many=True)
+            return Response({'status': True,
+                             'Response': subject_serializer.data},
+                            status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+#############################################
+## Students
+#############################################
+# ListStudentsView,
+# AddStudentView,
+# UpdateStudentView,
+# ListStudentSubjectsView
+

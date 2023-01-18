@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'users',
     'schools',
-    'subjects'
+    'school_extras'
 ]
 
 MIDDLEWARE = [

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 
 from .views import (
     ListSchoolsView,
@@ -16,4 +16,5 @@ urlpatterns = [
     path('register/', AddSchoolView.as_view(), name='register_school'),
     path('<int:school_id>/update/', UpdateSchoolView.as_view(), name='update_school'),
     path('<int:school_id>/dp-upload/', SchoolsDPView.as_view(), name='school_dp_upload'),
+    path('<int:school_id>/', include("school_extras.urls", namespace="school_extras_api")),
 ]
