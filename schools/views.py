@@ -117,14 +117,14 @@ class SchoolsDPView(APIView):
 
     __doc__ = "Update school display picture"
 
-    @swagger_auto_schema(tags=["Schools"])
+    @swagger_auto_schema(tags=["Schools"],)
     def post(self, request, school_id=None):
         try:
             school = self.queryset.get(pk=int(school_id))
             if not request.FILES.get('file'):
                 raise ObjectDoesNotExist("'Request File' object is empty")
             filepath = "uploads/pictures/profiles/" + str(request.FILES['file'])
-            if upload(request, filepath):
+            if upload(request, filepath, "image"):
                 school.DP=filepath
                 school.save()
                 return Response({'status': True,
@@ -132,7 +132,7 @@ class SchoolsDPView(APIView):
                                 'path':filepath},
                                 status=status.HTTP_200_OK)
             else:
-                return Response({'status': False}, status=status.HTTP_400_BAD_REQUEST)
+                raise Exception("Upload Request failed!")
         except (AttributeError, ObjectDoesNotExist) as e:
             return Response({'status': False,
                             'message': str(e),},
