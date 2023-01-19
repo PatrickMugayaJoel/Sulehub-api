@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 # Django imports.
 from django.urls import path,include
 from app.swagger import schema_view
-from study_groups import ListStudentStudyGroupsView
+from study_groups.views import ListStudentStudyGroupsView
 from school_extras.views import (
     AddStudentView, UpdateStudentView,
     AddSubjectView, UpdateSubjectView,

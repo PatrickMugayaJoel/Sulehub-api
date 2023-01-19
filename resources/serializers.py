@@ -5,7 +5,7 @@ from .models import Resource
 class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resource
-        fields = ('id', 'name', 'price', 'tags', 'description', 'image', 'created_on', 'created_by')
+        fields = ('id', 'name', 'price', 'tags', 'description', 'image', 'file', 'created_on', 'created_by')
 
 class ResourceUpdateSerializer(serializers.ModelSerializer):
 

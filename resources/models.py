@@ -10,5 +10,6 @@ class Resource(models.Model):
     tags = models.TextField(blank=True)
     description = models.TextField(blank=True)
     image = models.CharField(max_length=100, blank=True)
+    _file = models.CharField(max_length=100, blank=True)
     created_by = models.ForeignKey(User, to_field='id', on_delete=models.CASCADE)
     created_on = models.DateTimeField(default=timezone.now)

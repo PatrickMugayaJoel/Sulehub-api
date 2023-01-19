@@ -7,9 +7,9 @@ from core.mail_messages import messages
 
 custom_logger = CustomLogger()
 
-def send_email(**args):
-    request = args.get("request")
-    recipient_list = args.get("recipient_list")
+def send_email(**kargs):
+    request = kargs.get("request")
+    recipient_list = kargs.get("recipient_list")
 
     if not recipient_list:
         if request:
@@ -17,9 +17,9 @@ def send_email(**args):
         else:
             return
 
-    subject = args.get("subject") or 'welcome to shulehub'
-    message = args.get("message") or 'Hi, thank you for choosing shulehub.'
-    template_data = messages(args.get("template"))
+    subject = kargs.get("subject") or 'welcome to shulehub'
+    message = kargs.get("message") or 'Hi, thank you for choosing shulehub.'
+    template_data = messages(kargs.get("template"), kargs)
 
     if template_data:
         subject = template_data["subject"]

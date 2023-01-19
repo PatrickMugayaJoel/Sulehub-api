@@ -1,4 +1,110 @@
-from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
-# Create your views here.
-ListResourceSalesView
+# local imports
+from .models import Sale
+from resources.models import Resource
+from .serializers import SaleSerializer, SaleUpdateSerializer
+
+
+class ListSalesView(APIView):
+    permission_classes = (AllowAny,)
+    __doc__ = "List all sales."
+
+    @swagger_auto_schema(tags=["Sales"])
+    def get(self, request):
+        try:
+            sales = Sale.objects.all()
+            sale_serializer = SaleSerializer(sales, many=True)
+            return Response({'status': True,
+                             'Response': sale_serializer.data},
+                            status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class ListResourceSalesView(APIView):
+    permission_classes = (AllowAny,)
+    __doc__ = "List all resource sales."
+
+    @swagger_auto_schema(tags=["Sales"])
+    def get(self, request, resource_id):
+        try:
+            resource = Resource.objects.get(pk=resource_id)
+            sales = Sale.objects.filter(resource=resource)
+            sale_serializer = SaleSerializer(sales, many=True)
+            return Response({'status': True,
+                             'Response': sale_serializer.data},
+                            status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class GetSaleView(APIView):
+    permission_classes = (AllowAny,)
+    __doc__ = "GET API for sale"
+
+    @swagger_auto_schema(tags=["Sales"])
+    def get(self, request, sale_id=None):
+        try:
+            sale = Sale.objects.get(pk=int(sale_id))
+            sale_serializer = SaleSerializer(sale, many=False)
+            return Response({'status': True,
+                             'Response': sale_serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False,
+                             'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class CreateSaleView(APIView):
+    permission_classes = (IsAuthenticated,)
+    __doc__ = "Create API for sale"
+
+    @swagger_auto_schema(tags=["Sales"])
+    def post(self, request):
+        try:
+            sale_serializer = SaleSerializer(data=request.data)
+            if sale_serializer.is_valid():
+                sale_serializer.save()
+                return Response({'status': True, 'message': sale_serializer.data}, status=status.HTTP_200_OK)
+            else:
+                message = ''
+                for error in sale_serializer.errors.values():
+                    message += " "
+                    message += error[0]
+                return Response({'status': False,
+                                 'message': message},
+                                status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'status': False,
+                             'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateSalesView(APIView):
+    permission_classes = (IsAuthenticated,)
+    __doc__ = "Profile Update API for sale"
+
+    @swagger_auto_schema(tags=["Sales"])
+    def put(self, request, sale_id=None):
+        try:
+            sale = Sale.objects.get(pk=int(sale_id))
+            sale_serializer = SaleUpdateSerializer(sale, data=request.data)
+            if sale_serializer.is_valid():
+                sale_serializer.save()
+                return Response({'status': True, 'message': sale_serializer.data}, status=status.HTTP_200_OK)
+            else:
+                message = ''
+                for error in sale_serializer.errors.values():
+                    message += " "
+                    message += error[0]
+                return Response({'status': False,
+                                 'message': message},
+                                status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'status': False,
+                             'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)

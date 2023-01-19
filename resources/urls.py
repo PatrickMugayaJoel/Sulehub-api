@@ -5,9 +5,10 @@ from .views import (
     ListResourcesView,
     ListResourceFeedbackView,
     CreateResourceView,
-    getResourceView,
+    GetResourceView,
     UpdateResourceView,
-    buyResourceView
+    ResourceImageUploadView,
+    ResourceFileUploadView
 )
 
 
@@ -18,7 +19,8 @@ urlpatterns = [
     path('<int:resource_id>/feedback', ListResourceFeedbackView.as_view(), name='list_resource_feedback'),
     path('<int:resource_id>/sales', ListResourceSalesView.as_view(), name='list_resource_sales'),
     path('create/', CreateResourceView.as_view(), name='create_resource'),
-    path('<int:resource_id>/', getResourceView.as_view(), name='get_resource'),
-    path('<int:resource_id>/buy', buyResourceView.as_view(), name='buy_resource'),
-    path('update/<int:resource_id>/', UpdateResourceView.as_view(), name='update_resource'),
+    path('<int:resource_id>/', GetResourceView.as_view(), name='get_resource'),
+    path('<int:resource_id>/update/', UpdateResourceView.as_view(), name='update_resource'),
+    path('<int:resource_id>/image-upload/', ResourceImageUploadView.as_view(), name='resource_image_upload'),
+    path('<int:resource_id>/file-upload/', ResourceFileUploadView.as_view(), name='resource_file_upload'),
 ]

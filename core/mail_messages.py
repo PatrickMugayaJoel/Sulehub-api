@@ -1,5 +1,5 @@
 
-def messages(template, **kargs):
+def messages(template, kargs):
     templates = {
         "USER_UPDATED":{
             "subject":"User information updated",
