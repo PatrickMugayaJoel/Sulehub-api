@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from users.models import User
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -182,6 +183,22 @@ class ListTeachersView(APIView):
         except Exception as e:
             return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+class ListTeachersRegistrationsView(APIView):
+    permission_classes = (IsAuthenticated,)
+    __doc__ = "List Teachers' Registrations."
+
+    @swagger_auto_schema(tags=["Teachers"])
+    def get(self, request, teacher_id):
+        try:
+            teacher = User.objects.get(pk=teacher_id, is_active=True)
+            teachers_regs = TeacherRegistration.objects.filter(teacher=teacher, is_active=True)
+            teacher_serializer = TeachersSerializer(teachers_regs, many=True)
+            return Response({'status': True,
+                             'Response': teacher_serializer.data},
+                            status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 class UpdateTeacherView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "Update Teacher's Registration Information."
@@ -230,6 +247,22 @@ class ListStudentsView(APIView):
             students = StudentRegistration.objects.filter(school=school_id, is_active=True)
             students_serializer = StudentsSerializer(students, many=True)
             return Response({'status': True, 'Response': students_serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class ListStudentsRegistrationsView(APIView):
+    permission_classes = (IsAuthenticated,)
+    __doc__ = "List Students' Registrations."
+
+    @swagger_auto_schema(tags=["Students"])
+    def get(self, request, student_id):
+        try:
+            student = User.objects.get(pk=student_id, is_active=True)
+            students_regs = StudentRegistration.objects.filter(student=student, is_active=True)
+            students_serializer = StudentsSerializer(students_regs, many=True)
+            return Response({'status': True,
+                             'Response': students_serializer.data},
+                            status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
