@@ -64,7 +64,7 @@ class CreateEventView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "Create API for event"
 
-    @swagger_auto_schema(tags=["Events"])
+    @swagger_auto_schema(request_body=EventSerializer, tags=["Events"])
     def post(self, request):
         try:
             event_serializer = EventSerializer(data=request.data)
@@ -88,7 +88,7 @@ class UpdateEventView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "Profile Update API for event"
 
-    @swagger_auto_schema(tags=["Events"])
+    @swagger_auto_schema(request_body=EventUpdateSerializer, tags=["Events"])
     def put(self, request, event_id=None):
         try:
             event = Event.objects.get(pk=int(event_id))

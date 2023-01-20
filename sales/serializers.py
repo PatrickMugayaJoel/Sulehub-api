@@ -6,6 +6,7 @@ class SaleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sale
         fields = ('id', 'price', 'resource', 'reference_text', 'created_on', 'created_by')
+        extra_kwargs = {'created_on':{'read_only':True},} # TODO: created_by: should be auto added and a read_only
 
 class SaleUpdateSerializer(serializers.ModelSerializer):
 

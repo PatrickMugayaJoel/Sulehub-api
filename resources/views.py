@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # local imports
 from .models import Resource
-from sales.models import Sale
+from core.upload_service import upload
 from .serializers import ResourceSerializer, ResourceUpdateSerializer
 
 
@@ -47,7 +47,7 @@ class CreateResourceView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "Create API for resource"
 
-    @swagger_auto_schema(tags=["Resources"])
+    @swagger_auto_schema(request_body=ResourceSerializer, tags=["Resources"])
     def post(self, request):
         try:
             resource_serializer = ResourceSerializer(data=request.data)
@@ -71,7 +71,7 @@ class UpdateResourceView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "Profile Update API for resource"
 
-    @swagger_auto_schema(tags=["Resources"])
+    @swagger_auto_schema(request_body=ResourceUpdateSerializer, tags=["Resources"])
     def put(self, request, resource_id=None):
         try:
             resource = Resource.objects.get(pk=int(resource_id))
@@ -130,6 +130,7 @@ class ResourceFileUploadView(APIView):
             filepath = "uploads/files/resources/" + str(request.FILES['file'])
             if upload(request, filepath, "document"):
                 resource._file=filepath
+                resource.is_active=True
                 resource.save()
                 return Response({'status': True,
                                 'message': "file successfully uploaded",

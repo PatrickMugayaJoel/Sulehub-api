@@ -271,9 +271,9 @@ class ListStudentSubjectsView(APIView):
     __doc__ = "List a Student's subjects in a specific school."
 
     @swagger_auto_schema(tags=["Students"])
-    def get(self, request, school_id, student_reg_id):
+    def get(self, request, school_id, member_id):
         try:
-            student_reg_obj = StudentRegistration.objects.get(pk=int(student_reg_id))
+            student_reg_obj = StudentRegistration.objects.get(pk=int(member_id))
             if not (student_reg_obj and student_reg_obj.is_active):
                 return Response({'status': True, 'Response': []}, status=status.HTTP_200_OK)
             student_subjects = Subject.objects.filter(school=school_id, level=student_reg_obj.level)
@@ -310,9 +310,9 @@ class UpdateStudentView(APIView):
     __doc__ = "Update Student's Registration Information."
 
     @swagger_auto_schema(request_body=StudentsUpdateSerializer, tags=["Students"])
-    def put(self, request, student_reg_id):
+    def put(self, request, member_id):
         try:
-            student = StudentRegistration.objects.get(pk=student_reg_id)
+            student = StudentRegistration.objects.get(pk=member_id)
             student_serializer = StudentsUpdateSerializer(student, data=request.data)
             if student_serializer.is_valid():
                 print("yess")

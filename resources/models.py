@@ -9,6 +9,7 @@ class Resource(models.Model):
     price = models.DecimalField(max_digits=12, decimal_places=2)
     tags = models.TextField(blank=True)
     description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=False)
     image = models.CharField(max_length=100, blank=True)
     _file = models.CharField(max_length=100, blank=True)
     created_by = models.ForeignKey(User, to_field='id', on_delete=models.CASCADE)

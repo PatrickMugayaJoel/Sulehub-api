@@ -3,7 +3,6 @@ from feedback.views import ListResourceFeedbackView
 from sales.views import ListResourceSalesView
 from .views import (
     ListResourcesView,
-    ListResourceFeedbackView,
     CreateResourceView,
     GetResourceView,
     UpdateResourceView,

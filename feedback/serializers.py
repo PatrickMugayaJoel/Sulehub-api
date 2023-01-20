@@ -6,11 +6,12 @@ class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = ('id', 'title', 'category', 'description', 'resource', 'created_on', 'created_by')
+        extra_kwargs = {'created_on':{'read_only':True},} # TODO: created_by: should be auto added and a read_only
 
-class FeedbackSerializer(serializers.ModelSerializer):
+class FeedbackUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, data, *args, **kwargs):
-       return super(FeedbackSerializer, self).validate(data, *args, **kwargs)
+       return super(FeedbackUpdateSerializer, self).validate(data, *args, **kwargs)
 
     def update(self, instance, validated_data):
         instance.title = validated_data['title']

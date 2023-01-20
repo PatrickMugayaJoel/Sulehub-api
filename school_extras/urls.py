@@ -29,7 +29,7 @@ urlpatterns = [
 
     ## Students
     path('students/', ListStudentsView.as_view(), name='list_students'),
-    path('students/<int:student_reg_id>/subjects/', ListStudentSubjectsView.as_view(), name='get_student_subjects'),
+    path('students/<int:member_id>/subjects/', ListStudentSubjectsView.as_view(), name='get_student_subjects'),
     # TODO: endpoint for all subjects independent of school (Should be put in users.url)
     ###########################
     ## For getting registration specific info, else use get_user endpoint.

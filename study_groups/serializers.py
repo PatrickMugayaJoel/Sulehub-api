@@ -6,6 +6,7 @@ class StudyGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudyGroup
         fields = ('id', 'name', 'school', 'tags', 'description', 'level', 'is_active', 'created_on', 'created_by')
+        extra_kwargs = {'created_on':{'read_only':True},} # TODO: created_by: should be auto added and a read_only
 
 class StudyGroupUpdateSerializer(serializers.ModelSerializer):
 
@@ -18,13 +19,13 @@ class StudyGroupUpdateSerializer(serializers.ModelSerializer):
         instance.tags = validated_data['tags']
         instance.is_active = validated_data['is_active']
         instance.description = validated_data['description']
-        instance.expires_on = validated_data['expires_on']
+        instance.is_active = validated_data['is_active']
         instance.save()
         return instance
 
     class Meta:
         model = StudyGroup
-        fields = ('name', 'school', 'description', 'tags', 'expires_on')
+        fields = ('name', 'school', 'description', 'tags', 'is_active',)
 
 ## Group Registrations
 #############################################
@@ -32,6 +33,7 @@ class GroupRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupRegistration
         fields = ('member_id', 'student', 'study_group', 'is_active', 'created')
+        extra_kwargs = {'created':{'read_only':True},}
 
 class GroupRegistrationUpdateSerializer(serializers.ModelSerializer):
 

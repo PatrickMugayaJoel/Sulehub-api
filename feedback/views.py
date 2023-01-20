@@ -64,7 +64,7 @@ class CreateFeedbackView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "Create API for feedback"
 
-    @swagger_auto_schema(tags=["Feedback"])
+    @swagger_auto_schema(request_body=FeedbackSerializer, tags=["Feedback"])
     def post(self, request):
         try:
             feedback_serializer = FeedbackSerializer(data=request.data)
@@ -88,7 +88,7 @@ class UpdateFeedbackView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "Profile Update API for feedback"
 
-    @swagger_auto_schema(tags=["Feedback"])
+    @swagger_auto_schema(request_body=FeedbackUpdateSerializer, tags=["Feedback"])
     def put(self, request, feedback_id=None):
         try:
             feedback = Feedback.objects.get(pk=int(feedback_id))

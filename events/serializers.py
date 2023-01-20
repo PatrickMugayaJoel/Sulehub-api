@@ -6,6 +6,7 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('id', 'name', 'school', 'tags', 'description', 'expires_on', 'created_on', 'created_by')
+        extra_kwargs = {'created_on':{'read_only':True},} # TODO: created_by: should be auto added and a read_only
 
 class EventUpdateSerializer(serializers.ModelSerializer):
 

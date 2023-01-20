@@ -64,7 +64,7 @@ class CreateSaleView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "Create API for sale"
 
-    @swagger_auto_schema(tags=["Sales"])
+    @swagger_auto_schema(request_body=SaleSerializer, tags=["Sales"])
     def post(self, request):
         try:
             sale_serializer = SaleSerializer(data=request.data)
@@ -88,7 +88,7 @@ class UpdateSalesView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "Profile Update API for sale"
 
-    @swagger_auto_schema(tags=["Sales"])
+    @swagger_auto_schema(request_body=SaleUpdateSerializer, tags=["Sales"])
     def put(self, request, sale_id=None):
         try:
             sale = Sale.objects.get(pk=int(sale_id))
