@@ -145,7 +145,8 @@ class UserDPUploadView(APIView):
             if not request.FILES.get('file'):
                 raise ObjectDoesNotExist("'Request File' object is empty")
             filepath = "uploads/pictures/profiles/" + str(request.FILES['file'])
-            if upload(request, filepath, "image"):
+            result = upload(request, filepath, "image")
+            if result["status"]:
                 request.user.DP=filepath
                 request.user.save()
                 return Response({'status': True,
@@ -153,7 +154,7 @@ class UserDPUploadView(APIView):
                                 'path':filepath},
                                 status=status.HTTP_200_OK)
             else:
-                return Response({'status': False}, status=status.HTTP_400_BAD_REQUEST)
+                raise Exception(result["message"])
         except Exception as e:
             return Response({'status': False,
                             'message': str(e),},

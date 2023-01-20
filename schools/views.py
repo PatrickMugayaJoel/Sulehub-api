@@ -127,7 +127,8 @@ class SchoolsDPView(APIView):
             if not request.FILES.get('file'):
                 raise ObjectDoesNotExist("'Request File' object is empty")
             filepath = "uploads/pictures/profiles/" + str(request.FILES['file'])
-            if upload(request, filepath, "image"):
+            result = upload(request, filepath, "image")
+            if result["status"]:
                 school.DP=filepath
                 school.save()
                 return Response({'status': True,
@@ -135,8 +136,8 @@ class SchoolsDPView(APIView):
                                 'path':filepath},
                                 status=status.HTTP_200_OK)
             else:
-                raise Exception("Upload Request failed!")
-        except (AttributeError, ObjectDoesNotExist) as e:
+                raise Exception(result["message"])
+        except Exception as e:
             return Response({'status': False,
                             'message': str(e),},
                             status=status.HTTP_400_BAD_REQUEST)

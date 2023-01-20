@@ -27,7 +27,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = '6%hc3+^4=3phyx=86dqp%kl!g850jsv1keaw4u7tv(b&k_d324'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["127.0.0.1", "shulehubAPI.pythonanywhere.com"]
 

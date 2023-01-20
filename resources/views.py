@@ -112,7 +112,8 @@ class ResourceImageUploadView(APIView):
             if not request.FILES.get('file'):
                 raise ObjectDoesNotExist("'Request File' object is empty")
             filepath = "uploads/pictures/resources/" + str(request.FILES['file'])
-            if upload(request, filepath, "image"):
+            result = upload(request, filepath, "image")
+            if result["status"]:
                 resource.image=filepath
                 resource.save()
                 return Response({'status': True,
@@ -120,8 +121,8 @@ class ResourceImageUploadView(APIView):
                                 'path':filepath},
                                 status=status.HTTP_200_OK)
             else:
-                raise Exception("Upload Request failed!")
-        except (AttributeError, ObjectDoesNotExist) as e:
+                raise Exception(result["message"])
+        except Exception as e:
             return Response({'status': False,
                             'message': str(e),},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -140,7 +141,8 @@ class ResourceFileUploadView(APIView):
             if not request.FILES.get('file'):
                 raise ObjectDoesNotExist("'Request File' object is empty")
             filepath = "uploads/files/resources/" + str(request.FILES['file'])
-            if upload(request, filepath, "document"):
+            result = upload(request, filepath, "document")
+            if result["status"]:
                 resource._file=filepath
                 resource.is_active=True
                 resource.save()
@@ -149,8 +151,8 @@ class ResourceFileUploadView(APIView):
                                 'path':filepath},
                                 status=status.HTTP_200_OK)
             else:
-                raise Exception("Upload Request failed!")
-        except (AttributeError, ObjectDoesNotExist) as e:
+                raise Exception(result["message"])
+        except Exception as e:
             return Response({'status': False,
                             'message': str(e),},
                             status=status.HTTP_400_BAD_REQUEST)

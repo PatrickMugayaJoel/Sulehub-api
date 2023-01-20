@@ -13,19 +13,25 @@ def upload(request, path, _type):
     file_obj = request.FILES['file']
     content_type = magic.from_buffer(file_obj.read(), mime=True)
     accepted_types = {
-        "image": ["image/png", "image/tiff", "image/jpeg", "image/gif"]
+        "image": ["image/png", "image/tiff", "image/jpeg", "image/gif"],
+        "document": [
+            "text/richtext", "text/plain", "application/vnd.ms-excel", "application/msword"
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/epub+zip", "application/pdf"
+        ]
     }
 
     if not content_type in accepted_types[_type]:
-        raise Exception("Allowed File types are png, jpg and gif")
-    if file_obj.size > 5*1000*1000: # 5mbs
-        raise Exception("Maximum allowed file size is 5mbs!")
+        return {"status": False, "message": "Uploaded file type is not allowed!"}
+    if file_obj.size > 10*1000*1000: # 10mbs
+        return {"status": False, "message": "Maximum allowed file size is 10mbs!"}
 
     try:
         _file = os.path.join(settings.STATIC_ROOT, path)
-        # path = default_storage.save(_file, ContentFile(file_obj.read()))
-        return True
+        path = default_storage.save(_file, ContentFile(file_obj.read()))
+        return {"status": True, "message": "File Uploaded successfully"}
     except Exception as e:
         print("ERROR: ",e)
         custom_logger.log_error("upload", str(e), request, "File_Upload")
-        raise Exception("File Upload failed!")
+        return {"status": False, "message": "File Upload failed!"}
