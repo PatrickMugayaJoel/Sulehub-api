@@ -21,7 +21,6 @@ from .serializers import (
     UserUpdateSerializer
 )
 from app.utils import generate_jwt_token
-from core.email_service import send_email
 from core.upload_service import upload
 
 
@@ -37,13 +36,6 @@ class RegistrationAPIView(CreateAPIView):
             if user_serializer.is_valid():
                 user = user_serializer.save()
                 data = generate_jwt_token(user, user_serializer.data)
-
-                send_email(
-                    recipient_list = [user.email,],
-                    request = request,
-                    template = "USER_CREATED",
-                )
-
                 return Response(data, status=status.HTTP_200_OK)
             else:
                 message = ''
@@ -180,7 +172,6 @@ class UpdateAPIView(UpdateAPIView):
             user_serializer = self.serializer_class(user, data=request.data)
             if user_serializer.is_valid():
                 user_serializer.save()
-                send_email(request=request, template="USER_UPDATED",)
                 return Response(user_serializer.data, status=status.HTTP_200_OK)
             else:
                 message = ''

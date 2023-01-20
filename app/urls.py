@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 # Django imports.
 from django.urls import path,include
 from app.swagger import schema_view
-from study_groups.views import StudyGroupRegStatusView
+from study_groups.views import StudentStudyGroupRegsView
 from school_extras.views import (
     AddStudentView, UpdateStudentView,
     AddSubjectView, UpdateSubjectView,
@@ -24,7 +24,7 @@ urlpatterns = [
     path('subjects/<int:subject_id>/update/', UpdateSubjectView.as_view(), name='update_subject'),
     path('students/register/', AddStudentView.as_view(), name='register_student'),
     path('students/<int:student_id>/school_registrations/', ListStudentsRegistrationsView.as_view(), name='student_sch_registrations'),
-    path('students/<int:student_id>/study_group_registrations/', StudyGroupRegStatusView.as_view(), name='student_stdy_grp_registrations'),
+    path('students/<int:student_id>/study_group_registrations/', StudentStudyGroupRegsView.as_view(), name='student_stdy_grp_registrations'),
     path('students/<int:member_id>/update/', UpdateStudentView.as_view(), name='update_student'),
     path('teachers/register/', AddTeacherView.as_view(), name='register_teacher'),
     path('teachers/<int:teacher_id>/registrations/', ListTeachersRegistrationsView.as_view(), name='teacher_registrations'),

@@ -92,6 +92,9 @@ class UpdateSalesView(APIView):
     def put(self, request, sale_id=None):
         try:
             sale = Sale.objects.get(pk=int(sale_id))
+            if not sale.created_by == request.user:
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
             sale_serializer = SaleUpdateSerializer(sale, data=request.data)
             if sale_serializer.is_valid():
                 sale_serializer.save()

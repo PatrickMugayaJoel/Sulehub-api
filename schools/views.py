@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 # local imports
 from .models import School
 from .serializers import SchoolSerializer, SchoolUpdateSerializer
-from core.email_service import send_email
 from core.upload_service import upload
 
 
@@ -67,7 +66,6 @@ class AddSchoolView(APIView):
             school_serializer = self.serializer_class(data=request.data)
             if school_serializer.is_valid():
                 school_serializer.save()
-                send_email(request=request, template="SCHOOL_PROFILE_CREATED",) # TODO: This mail will be sent to person loggedin!
                 return Response({'status': True, 'message': school_serializer.data}, status=status.HTTP_200_OK)
             else:
                 message = ''
@@ -95,8 +93,10 @@ class UpdateSchoolView(APIView):
             school = self.queryset.get(pk=int(school_id))
             school_serializer = self.serializer_class(school, data=request.data)
             if school_serializer.is_valid():
+                if not school_serializer.manager == request.user:
+                    return Response({'status': False, 'message': "Permission to perform action denied"},
+                                    status=status.HTTP_401_UNAUTHORIZED)
                 school_serializer.save()
-                send_email(request=request, template="SCHOOL_PROFILE_UPDATED",) # TODO: This mail will be sent to person loggedin!
                 return Response({'status': True, 'message': school_serializer.data}, status=status.HTTP_200_OK)
             else:
                 message = ''
@@ -121,6 +121,9 @@ class SchoolsDPView(APIView):
     def post(self, request, school_id=None):
         try:
             school = self.queryset.get(pk=int(school_id))
+            if not school.manager == request.user:
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
             if not request.FILES.get('file'):
                 raise ObjectDoesNotExist("'Request File' object is empty")
             filepath = "uploads/pictures/profiles/" + str(request.FILES['file'])

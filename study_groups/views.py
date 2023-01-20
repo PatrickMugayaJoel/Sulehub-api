@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 # local imports
 from .models import StudyGroup, GroupRegistration
 from users.serializers import UserCreateSerializer
+from core.email_service import send_email
 from .serializers import (
     StudyGroupSerializer, StudyGroupUpdateSerializer,
     GroupRegistrationSerializer, GroupRegistrationUpdateSerializer
@@ -97,6 +98,9 @@ class UpdateStudyGroupsView(APIView):
     def put(self, request, study_group_id=None):
         try:
             study_group = StudyGroup.objects.get(pk=int(study_group_id))
+            if not study_group.created_by == request.user:
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
             study_group_serializer = StudyGroupUpdateSerializer(study_group, data=request.data)
             if study_group_serializer.is_valid():
                 study_group_serializer.save()
@@ -123,8 +127,22 @@ class JoinStudyGroupView(APIView):
         try:
             group_reg_serializer = GroupRegistrationSerializer(data=request.data)
             if group_reg_serializer.is_valid():
+                vdata = group_reg_serializer.validated_data
+                student_regs = GroupRegistration.objects.filter(study_group=vdata['study_group'])
+                students = [vdata['study_group'].created_by, ]
+                for reg in student_regs:
+                    if reg.is_active:
+                        students.append(reg.student)
+                if not request.user in students:
+                    return Response({'status': False, 'message': "Permission to perform action denied"},
+                                    status=status.HTTP_401_UNAUTHORIZED)
                 group_reg_serializer.save()
-                return Response({'status': True, 'message': group_reg_serializer.data}, status=status.HTTP_200_OK)
+                data = group_reg_serializer.data
+                send_email(
+                    request=request, template="STUDY_GROUP_REGISTRATION",
+                    recipient_list=[vdata['student'].email,], STUDY_GROUP_NAME=vdata['study_group'].name
+                )
+                return Response({'status': True, 'message': data}, status=status.HTTP_200_OK)
             else:
                 message = ''
                 for error in group_reg_serializer.errors.values():
@@ -146,6 +164,9 @@ class UpdateRegistrationView(APIView):
     def put(self, request, member_id=None):
         try:
             study_group_reg = GroupRegistration.objects.get(pk=int(member_id))
+            if not ((study_group_reg.study_group.created_by == request.user) or (request.user == study_group_reg.student)):
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
             study_group_reg_serializer = GroupRegistrationUpdateSerializer(study_group_reg, data=request.data)
             if study_group_reg_serializer.is_valid():
                 study_group_reg_serializer.save()
@@ -163,15 +184,19 @@ class UpdateRegistrationView(APIView):
                              'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
-class StudyGroupRegStatusView(APIView):
+class StudentStudyGroupRegsView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "Study Groups Registration status API"
 
     @swagger_auto_schema(tags=["Study Groups"])
     def get(self, request, student_id=None):
         try:
-            study_group = GroupRegistration.objects.get(student=int(student_id))
-            study_group_serializer = GroupRegistrationSerializer(study_group, many=False)
+            study_group_regs = GroupRegistration.objects.filter(student=int(student_id))
+            filtered_regs = []
+            for study_group_reg in study_group_regs: ## returning only what the user is permited to view
+                if ((study_group_reg.study_group.created_by == request.user) or (request.user == study_group_reg.student)):
+                    filtered_regs.append(study_group_reg)
+            study_group_serializer = GroupRegistrationSerializer(filtered_regs, many=True)
             return Response({'status': True,
                              'Response': study_group_serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:

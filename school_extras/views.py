@@ -73,6 +73,10 @@ class AddSubjectView(APIView):
         try:
             subject_serializer = self.serializer_class(data=request.data)
             if subject_serializer.is_valid():
+                school = subject_serializer.validated_data["school"]
+                if not school.manager == request.user:
+                    return Response({'status': False, 'message': "Permission to perform action denied"},
+                                    status=status.HTTP_401_UNAUTHORIZED)
                 subject_serializer.save()
                 return Response({'status': True, 'message': subject_serializer.data}, status.HTTP_201_CREATED)
             else:
@@ -99,6 +103,9 @@ class UpdateSubjectView(APIView):
     def put(self, request, subject_id=None):
         try:
             subject = self.queryset.get(pk=int(subject_id))
+            if not subject.school.manager == request.user:
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
             subject_serializer = self.serializer_class(subject, data=request.data)
             if subject_serializer.is_valid():
                 subject_serializer.save()
@@ -206,10 +213,15 @@ class UpdateTeacherView(APIView):
     @swagger_auto_schema(request_body=TeachersUpdateSerializer, tags=["Teachers"])
     def put(self, request, teacher_reg_id):
         try:
-            school_teachers = TeacherRegistration.objects.get(pk=teacher_reg_id)
-            teacher_serializer = TeachersUpdateSerializer(school_teachers, data=request.data, many=False)
+            school_teacher = TeacherRegistration.objects.get(pk=teacher_reg_id)
+            if not ((school_teacher.school.manager == request.user) or (school_teacher.teacher == request.user)):
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
+            teacher_serializer = TeachersUpdateSerializer(school_teacher, data=request.data, many=False)
             if teacher_serializer.is_valid():
                 teacher_serializer.save()
+            else:
+                raise Exception("Provided data is invalid")
             return Response({'status': True, 'Response': teacher_serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -223,6 +235,12 @@ class AddTeacherView(APIView):
         try:
             teacher_serializer = TeachersSerializer(data=request.data)
             if teacher_serializer.is_valid():
+                data = teacher_serializer.validated_data
+                if not data['teacher'].role.lower() == "teacher":
+                    raise Exception("User being registered is not a 'teacher'")
+                if not data['school'].manager == request.user:
+                    return Response({'status': False, 'message': "Permission to perform action denied"},
+                                    status=status.HTTP_401_UNAUTHORIZED)
                 teacher_serializer.save()
                 return Response({'status': True, 'message': teacher_serializer.data}, status=status.HTTP_201_CREATED)
             else:
@@ -294,6 +312,15 @@ class AddStudentView(APIView):
         try:
             student_serializer = StudentsSerializer(data=request.data)
             if student_serializer.is_valid():
+                data = student_serializer.validated_data
+                teacher_regs = TeacherRegistration.objects.filter(school=data['school'])
+                teachers = [student_serializer.school.manager, ]
+                for reg in teacher_regs:
+                    if reg.is_active:
+                        teachers.append(reg.teacher)
+                if not request.user in teachers:
+                    return Response({'status': False, 'message': "Permission to perform action denied"},
+                                    status=status.HTTP_401_UNAUTHORIZED)
                 student_serializer.save()
                 return Response({'status': True, 'message': student_serializer.data}, status=status.HTTP_201_CREATED)
             else:
@@ -315,8 +342,18 @@ class UpdateStudentView(APIView):
             student = StudentRegistration.objects.get(pk=member_id)
             student_serializer = StudentsUpdateSerializer(student, data=request.data)
             if student_serializer.is_valid():
-                print("yess")
+                data = student_serializer.validated_data
+                teacher_regs = TeacherRegistration.objects.filter(school=data['school'])
+                teachers = [data['school'].manager, ]
+                for reg in teacher_regs:
+                    if reg.is_active:
+                        teachers.append(reg.teacher)
+                if not request.user in teachers:
+                    return Response({'status': False, 'message': "Permission to perform action denied"},
+                                    status=status.HTTP_401_UNAUTHORIZED)
                 student_serializer.save()
+            else:
+                raise Exception("Provided data is invalid")
             return Response({'status': True, 'Response': student_serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)

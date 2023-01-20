@@ -1,21 +1,17 @@
 
 def messages(template, kargs):
     templates = {
-        "USER_UPDATED":{
-            "subject":"User information updated",
-            "message":"""User information was successfully updated."""
+        "STUDY_GROUP_REGISTRATION":{
+            "subject":"Shulehub:- Study Groups",
+            "message":f"""You have been added to the Study group: {kargs.get("STUDY_GROUP_NAME")}."""
         },
-        "USER_CREATED":{
-            "subject":"User account created",
-            "message":"""Your user account was successfully created."""
+        "FEEDBACK_CREATED":{
+            "subject":"Shulehub:- Resource Comments",
+            "message":f"""{kargs.get("FEEDBACK_CATEGORY")} comment has been created for the Resource: {kargs.get("RESOURCE_NAME")}."""
         },
-        "SCHOOL_PROFILE_UPDATED":{
-            "subject":"School Profile Updated",
-            "message":"""Your user account has successfully been updated."""
-        },
-        "SCHOOL_PROFILE_CREATED":{
-            "subject":"School Profile Created",
-            "message":"""Your user account has successfully been created."""
+        "EVENT_CREATED":{
+            "subject":"Shulehub:- Event Created",
+            "message":f"""An event ({kargs.get("EVENT_NAME")}) has been created for the school: {kargs.get("SCHOOL_NAME")}."""
         }
     }
     return templates.get(template)

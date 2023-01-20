@@ -50,6 +50,9 @@ class CreateResourceView(APIView):
     @swagger_auto_schema(request_body=ResourceSerializer, tags=["Resources"])
     def post(self, request):
         try:
+            if not "teacher" == request.user.role.lower():
+                return Response({'status': False, 'message': "Action only allowed for role 'teacher'"},
+                                status=status.HTTP_401_UNAUTHORIZED)
             resource_serializer = ResourceSerializer(data=request.data)
             if resource_serializer.is_valid():
                 resource_serializer.save()
@@ -75,6 +78,9 @@ class UpdateResourceView(APIView):
     def put(self, request, resource_id=None):
         try:
             resource = Resource.objects.get(pk=int(resource_id))
+            if not resource.created_by == request.user:
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
             resource_serializer = ResourceUpdateSerializer(resource, data=request.data)
             if resource_serializer.is_valid():
                 resource_serializer.save()
@@ -100,6 +106,9 @@ class ResourceImageUploadView(APIView):
     def post(self, request, resource_id=None):
         try:
             resource = Resource.objects.get(pk=int(resource_id))
+            if not resource.created_by == request.user:
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_400_BAD_REQUEST)
             if not request.FILES.get('file'):
                 raise ObjectDoesNotExist("'Request File' object is empty")
             filepath = "uploads/pictures/resources/" + str(request.FILES['file'])
@@ -125,6 +134,9 @@ class ResourceFileUploadView(APIView):
     def post(self, request, resource_id=None):
         try:
             resource = Resource.objects.get(pk=int(resource_id))
+            if not resource.created_by == request.user:
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
             if not request.FILES.get('file'):
                 raise ObjectDoesNotExist("'Request File' object is empty")
             filepath = "uploads/files/resources/" + str(request.FILES['file'])

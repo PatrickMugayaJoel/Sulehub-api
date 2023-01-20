@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 # local imports
 from .models import Event
 from schools.models import School
+from core.email_service import send_email
 from .serializers import EventSerializer, EventUpdateSerializer
 
 
@@ -69,8 +70,17 @@ class CreateEventView(APIView):
         try:
             event_serializer = EventSerializer(data=request.data)
             if event_serializer.is_valid():
+                school = event_serializer.validated_data['school']
+                if not school.manager == request.user:
+                    return Response({'status': False, 'message': "Permission to perform action denied"},
+                                    status=status.HTTP_401_UNAUTHORIZED)
                 event_serializer.save()
-                return Response({'status': True, 'message': event_serializer.data}, status=status.HTTP_200_OK)
+                data = event_serializer.data
+                send_email(request=request, template="EVENT_CREATED",
+                           EVENT_NAME=data['name'], SCHOOL_NAME=school.name,
+                    recipient_list=[school.manager.email,]
+                )
+                return Response({'status': True, 'message': data}, status=status.HTTP_200_OK)
             else:
                 message = ''
                 for error in event_serializer.errors.values():
@@ -92,6 +102,9 @@ class UpdateEventView(APIView):
     def put(self, request, event_id=None):
         try:
             event = Event.objects.get(pk=int(event_id))
+            if not ((event.created_by == request.user) or (event.school.manager == request.user)):
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
             event_serializer = EventUpdateSerializer(event, data=request.data)
             if event_serializer.is_valid():
                 event_serializer.save()

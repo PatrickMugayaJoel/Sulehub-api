@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.mail import send_mail
+import threading
 
 from custom_logger import CustomLogger
 from core.mail_messages import messages
@@ -27,7 +28,8 @@ def send_email(**kargs):
 
     try:
         email_from = settings.EMAIL_HOST_USER
-        send_mail(subject, message, email_from, recipient_list)
+        thread = threading.Thread(target=send_mail, args=[subject, message, email_from, recipient_list])
+        thread.start()
     except Exception as e:
         print("ERROR: ",e)
         custom_logger.log_error("EMAIL", str(e), request, "send_email")

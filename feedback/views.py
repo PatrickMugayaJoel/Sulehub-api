@@ -1,13 +1,13 @@
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 
 # local imports
 from .models import Feedback
 from resources.models import Resource
+from core.email_service import send_email
 from .serializers import FeedbackSerializer, FeedbackUpdateSerializer
 
 
@@ -70,6 +70,13 @@ class CreateFeedbackView(APIView):
             feedback_serializer = FeedbackSerializer(data=request.data)
             if feedback_serializer.is_valid():
                 feedback_serializer.save()
+                data = feedback_serializer.validated_data
+                send_email(
+                    RESOURCE_NAME=data['resource'].name,
+                    FEEDBACK_CATEGORY=data['category'],
+                    request=request, template="FEEDBACK_CREATED",
+                    recipient_list=[data['resource'].created_by.email,]
+                )
                 return Response({'status': True, 'message': feedback_serializer.data}, status=status.HTTP_200_OK)
             else:
                 message = ''
@@ -92,6 +99,9 @@ class UpdateFeedbackView(APIView):
     def put(self, request, feedback_id=None):
         try:
             feedback = Feedback.objects.get(pk=int(feedback_id))
+            if not feedback.created_by == request.user:
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
             feedback_serializer = FeedbackUpdateSerializer(feedback, data=request.data)
             if feedback_serializer.is_valid():
                 feedback_serializer.save()

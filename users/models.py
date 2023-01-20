@@ -58,7 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    role = models.CharField(max_length=20, default="admin")
+    role = models.CharField(max_length=20, default="")
     DP = models.CharField(_('Display Picture'), max_length=100, blank=True)
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
