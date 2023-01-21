@@ -93,7 +93,7 @@ class UpdateSchoolView(APIView):
             school = self.queryset.get(pk=int(school_id))
             school_serializer = self.serializer_class(school, data=request.data)
             if school_serializer.is_valid():
-                if not school_serializer.manager == request.user:
+                if not school_serializer.validated_data.manager == request.user:
                     return Response({'status': False, 'message': "Permission to perform action denied"},
                                     status=status.HTTP_401_UNAUTHORIZED)
                 school_serializer.save()
