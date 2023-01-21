@@ -314,7 +314,7 @@ class AddStudentView(APIView):
             if student_serializer.is_valid():
                 data = student_serializer.validated_data
                 teacher_regs = TeacherRegistration.objects.filter(school=data['school'])
-                teachers = [student_serializer.school.manager, ]
+                teachers = [data['school'].manager, ]
                 for reg in teacher_regs:
                     if reg.is_active:
                         teachers.append(reg.teacher)
