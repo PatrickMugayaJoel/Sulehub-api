@@ -37,4 +37,4 @@ def upload(request, path, _type):
     except Exception as e:
         print("ERROR: ",e)
         custom_logger.log_error("upload", str(e), request, "File_Upload")
-        return {"status": False, "message": str(e)}
+        return {"status": False, "message": "File Upload error!"}
