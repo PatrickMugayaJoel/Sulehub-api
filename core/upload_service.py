@@ -28,8 +28,12 @@ def upload(request, path, _type):
         return {"status": False, "message": "Maximum allowed file size is 10mbs!"}
 
     try:
-        _file = os.path.join(settings.STATIC_ROOT, path)
-        path = default_storage.save(_file, ContentFile(file_obj.read()))
+        _file = os.path.join(settings.STATICFILES_DIRS[0], path)
+        path = default_storage.save(_file)
+        destination = open(_file, 'wb+')
+        for chunk in file_obj.chunks():
+            destination.write(chunk)
+        destination.close()
         return {"status": True, "message": "File Uploaded successfully"}
     except Exception as e:
         print("ERROR: ",e)

@@ -95,10 +95,12 @@ ENV/
 db.sqlite3
 # mkdocs documentation
 /site
-/static/admin
-/static/drf-yasg
-/static/rest_framework
-/static/uploads
+/static
+# /static/admin
+# /static/drf-yasg
+# /static/rest_framework
+# !/static/styles.css
+# !/static//index.png
 # !/static/uploads/pictures/profiles/index.png
 
 # mypy
