@@ -1,7 +1,6 @@
 import os
 import magic
 from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -29,11 +28,11 @@ def upload(request, path, _type):
 
     try:
         _file = os.path.join(settings.STATICFILES_DIRS[0], path)
-        path = default_storage.save(_file)
-        destination = open(_file, 'wb+')
-        for chunk in file_obj.chunks():
-            destination.write(chunk)
-        destination.close()
+        path = default_storage.save(_file, content=file_obj)
+        # destination = open(_file, 'wb+')
+        # for chunk in file_obj.chunks():
+        #     destination.write(chunk)
+        # destination.close()
         return {"status": True, "message": "File Uploaded successfully"}
     except Exception as e:
         print("ERROR: ",e)
