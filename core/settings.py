@@ -30,7 +30,8 @@ SECRET_KEY = '6%hc3+^4=3phyx=86dqp%kl!g850jsv1keaw4u7tv(b&k_d324'
 DEBUG = False
 
 ALLOWED_HOSTS = ["127.0.0.1", "shulehubAPI.pythonanywhere.com"]
-
+# CORS_ALLOWED_ORIGINS = []
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'django_rest_passwordreset',
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
     'users',
     'schools',
     'school_extras',
@@ -63,6 +65,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
