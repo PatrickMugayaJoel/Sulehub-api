@@ -62,7 +62,7 @@ class LoginView(JSONWebTokenAPIView):
             if serializer.is_valid():
                 serialized_data = serializer.validate(request.data)
                 return Response({
-                    'status': True,
+                    'role': serialized_data['user'].role,
                     'username': serialized_data['user'].username,
                     'token': 'JWT ' + serialized_data['token'],
                 }, status=status.HTTP_200_OK)
