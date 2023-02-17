@@ -26,7 +26,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'password', 'username', 'first_name', 'last_name', 'role', 'DoB', 'contact', 'residence', 'gender', 'country', 'DP')
+        fields = ('email', 'id', 'password', 'username', 'first_name', 'last_name', 'role', 'DoB', 'contact', 'residence', 'gender', 'country', 'DP', 'Bio')
         extra_kwargs = {'password':{'write_only':True}}
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -45,12 +45,13 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.residence = validated_data['residence']
         instance.gender = validated_data['gender']
         instance.country = validated_data['country']
+        instance.Bio = validated_data['Bio']
         instance.save()
         return instance
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'first_name', 'last_name', 'role', 'DoB', 'contact', 'residence', 'gender', 'country')
+        fields = ('email', 'username', 'first_name', 'last_name', 'role', 'DoB', 'contact', 'residence', 'gender', 'country', 'Bio')
 
 class UserListSerializer(serializers.ModelSerializer):
 
