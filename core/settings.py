@@ -46,14 +46,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'corsheaders',
-    'users',
-    'schools',
-    'school_extras',
-    'resources',
-    'study_groups',
-    'events',
-    'feedback',
-    'sales',
+    'apps.users',
+    'apps.schools',
+    'apps.school_extras',
+    'apps.resources',
+    'apps.study_groups',
+    'apps.events',
+    'apps.feedback',
+    'apps.sales',
 ]
 
 MIDDLEWARE = [
