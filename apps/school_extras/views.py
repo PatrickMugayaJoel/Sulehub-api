@@ -23,14 +23,13 @@ from .serializers import (
 #############################################
 class ListSubjectsView(APIView):
     serializer_class = SubjectSerializer
-    queryset = Subject.objects.all()
     permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(tags=["Subjects"])
     def get(self, request, school_id):
         __doc__ = "List all subjects."
         try:
-            subjects = self.queryset.filter(school=school_id)
+            subjects = Subject.objects.filter(school__school_id=school_id)
             subject_serializer = self.serializer_class(subjects, many=True)
             return Response({'status': True,
                              'Response': subject_serializer.data},

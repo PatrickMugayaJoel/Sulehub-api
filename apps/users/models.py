@@ -40,11 +40,24 @@ class UserManager(BaseUserManager):
     def get_queryset(self):
         return super(UserManager, self).get_queryset()
 
+    def get_by_natural_key(self, pk):
+        return self.get(pk=pk)
+
 class AutoDateTimeField(models.DateTimeField):
     def pre_save(self, model_instance, add):
         return timezone.now()
 
 class User(AbstractBaseUser, PermissionsMixin):
+    GENDER = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+    ROLES = (
+        ('T', 'Teacher'),
+        ('S', 'Student'),
+        ('G', 'Guardian'),
+        ('P', 'Publisher'),
+    )
     username = models.CharField(max_length=80, blank=True)
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
@@ -52,13 +65,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     DoB = models.DateTimeField(_('Date of Birth'), null=True, blank=True)
     contact = PhoneNumberField(blank=True, unique=True) # null=False
     residence = models.CharField(max_length=80, blank=True)
-    gender = models.CharField(max_length=40, blank=True)
+    gender = models.CharField(max_length=1, choices=GENDER, blank=True)
     country = models.CharField(max_length=30, blank=True)
     Bio = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    role = models.CharField(max_length=20, default="")
+    role = models.CharField(max_length=1, choices=GENDER)
     DP = models.CharField(_('Display Picture'), max_length=100, blank=True)
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
@@ -68,6 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
 
     class Meta:
+        ordering = ['first_name']
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
@@ -78,14 +92,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
-    def get_short_name(self):
-        """
-        Returns the short name for the user.
-        """
-        return self.first_name
-
     def __str__(self):
         return self.email
+
+    # def natural_key(self):
+    #     return (self.first_name, self.last_name)
 
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
