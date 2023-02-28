@@ -20,7 +20,7 @@ from .serializers import (
     ChangePasswordSerializer,
     UserUpdateSerializer
 )
-from app.utils import generate_jwt_token
+from apps.utils import generate_jwt_token
 from core.upload_service import upload
 
 

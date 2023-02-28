@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
-from users.models import User
-from schools.models import School
+from apps.users.models import User
+from apps.schools.models import School
 
 
 class Event(models.Model):

@@ -1,6 +1,6 @@
 from django.urls import path
-from feedback.views import ListResourceFeedbackView
-from sales.views import ListResourceSalesView
+from apps.feedback.views import ListResourceFeedbackView
+from apps.sales.views import ListResourceSalesView
 from .views import (
     ListResourcesView,
     CreateResourceView,

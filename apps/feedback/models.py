@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
-from users.models import User
-from resources.models import Resource
+from apps.users.models import User
+from apps.resources.models import Resource
 
 
 class Feedback(models.Model):

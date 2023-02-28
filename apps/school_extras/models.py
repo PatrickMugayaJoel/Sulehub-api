@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from users.models import User
-from schools.models import School
+from apps.users.models import User
+from apps.schools.models import School
 
 
 class AutoDateTimeField(models.DateTimeField):

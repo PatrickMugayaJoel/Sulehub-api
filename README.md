@@ -6,6 +6,9 @@ Student-teacher Educational Application API
 
 - Clone this repository
 - Install python3.10
+- Install virtualenv: pip install virtualenv
+- Create a virtual environment: py -m virtualenv venv
+- Activate the virtual environment: 
 - Intall dependencies:
   > pip install -r requirements.txt
 - Run the server:

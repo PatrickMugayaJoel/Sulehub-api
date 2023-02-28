@@ -1,4 +1,3 @@
-# Django imports
 from django.contrib.auth.models import (
     PermissionsMixin,
     BaseUserManager,
@@ -95,7 +94,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-    # def natural_key(self):
+    # def natural_key(self): # or def get_natural_key(self):
     #     return (self.first_name, self.last_name)
 
 @receiver(reset_password_token_created)

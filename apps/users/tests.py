@@ -66,7 +66,7 @@ class APITests(TestCase):
 # from rest_framework import status
 
 # # local imports
-# from app.models import User
+# from apps.models import User
 
 
 # # Create your tests here.

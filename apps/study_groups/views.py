@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # local imports
 from .models import StudyGroup, GroupRegistration
-from users.serializers import UserCreateSerializer
+from apps.users.serializers import UserCreateSerializer
 from core.email_service import send_email
 from .serializers import (
     StudyGroupSerializer, StudyGroupUpdateSerializer,

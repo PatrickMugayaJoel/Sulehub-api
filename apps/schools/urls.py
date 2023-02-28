@@ -1,5 +1,5 @@
 from django.urls import path, include
-from events.views import ListSchoolEventsView
+from apps.events.views import ListSchoolEventsView
 from .views import (
     ListSchoolsView,
     GetSchoolView,

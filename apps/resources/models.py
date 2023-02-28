@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from users.models import User
+from apps.users.models import User
 
 
 class Resource(models.Model):
