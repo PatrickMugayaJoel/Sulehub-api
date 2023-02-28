@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # local imports
 from .models import Sale
-from resources.models import Resource
+from apps.resources.models import Resource
 from .serializers import SaleSerializer, SaleUpdateSerializer
 
 

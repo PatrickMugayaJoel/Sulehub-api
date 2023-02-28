@@ -6,11 +6,10 @@ from django.contrib.auth import logout
 # Rest Framework imports
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework_jwt.serializers import JSONWebTokenSerializer
-from rest_framework_jwt.views import JSONWebTokenAPIView
+from rest_framework_simplejwt.serializers import TokenObtainSerializer
 
 # local imports
 from .models import User
@@ -20,7 +19,6 @@ from .serializers import (
     ChangePasswordSerializer,
     UserUpdateSerializer
 )
-from apps.utils import generate_jwt_token
 from core.upload_service import upload
 
 
@@ -35,7 +33,7 @@ class RegistrationAPIView(CreateAPIView):
             user_serializer = self.serializer_class(data=request.data)
             if user_serializer.is_valid():
                 user = user_serializer.save()
-                data = generate_jwt_token(user, user_serializer.data)
+                data = user_serializer.data
                 return Response(data, status=status.HTTP_200_OK)
             else:
                 message = ''
@@ -50,15 +48,14 @@ class RegistrationAPIView(CreateAPIView):
                              'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
-class LoginView(JSONWebTokenAPIView):
-    serializer_class = JSONWebTokenSerializer
+class LoginView(APIView):
     
     __doc__ = "Log In API for user which returns token"
 
     @staticmethod
     def post(request):
         try:
-            serializer = JSONWebTokenSerializer(data=request.data)
+            serializer = TokenObtainSerializer(data=request.data)
             if serializer.is_valid():
                 serialized_data = serializer.validate(request.data)
                 return Response({
@@ -81,14 +78,12 @@ class LoginView(JSONWebTokenAPIView):
 
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
+    __doc__ = "Logout API for user"
 
     @staticmethod
     def post(request):
-        """
-        Logout API for user
-        """
         try:
-            user = request.user
+            # user = request.user
             logout(request)
             return Response({'status': True,
                              'message': "logout successfully"},

@@ -5,7 +5,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
 import phonenumber_field.modelfields
-import schools.models
+import apps.schools.models
 
 
 class Migration(migrations.Migration):
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('Bio', models.TextField(blank=True)),
                 ('DP', models.CharField(blank=True, max_length=100, verbose_name='Display Picture')),
                 ('created', models.DateTimeField(default=django.utils.timezone.now)),
-                ('updated', schools.models.AutoDateTimeField(default=django.utils.timezone.now)),
+                ('updated', apps.schools.models.AutoDateTimeField(default=django.utils.timezone.now)),
                 ('manager', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to=settings.AUTH_USER_MODEL)),
             ],
             options={

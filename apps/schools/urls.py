@@ -17,5 +17,5 @@ urlpatterns = [
     path('<int:school_id>/events', ListSchoolEventsView.as_view(), name='list_school_events'),
     path('<int:school_id>/update/', UpdateSchoolView.as_view(), name='update_school'),
     path('<int:school_id>/dp-upload/', SchoolsDPView.as_view(), name='school_dp_upload'),
-    path('<int:school_id>/', include("school_extras.urls", namespace="school_extras_api")),
+    path('<int:school_id>/', include("apps.school_extras.urls", namespace="school_extras_api")),
 ]

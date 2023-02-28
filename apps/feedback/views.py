@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 # local imports
 from .models import Feedback
-from resources.models import Resource
+from apps.resources.models import Resource
 from core.email_service import send_email
 from .serializers import FeedbackSerializer, FeedbackUpdateSerializer
 

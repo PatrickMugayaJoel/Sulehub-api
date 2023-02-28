@@ -32,7 +32,7 @@ urlpatterns = [
     path('schools/', include("apps.schools.urls", namespace="schools_api")),
     path('events/', include("apps.events.urls", namespace="events_api")),
     path('feedback/', include("apps.feedback.urls", namespace="feedback_api")),
-    path('resources/', include("resources.urls", namespace="resources_api")),
+    path('resources/', include("apps.resources.urls", namespace="resources_api")),
     path('sales/', include("apps.sales.urls", namespace="sales_api")),
     path('study_groups/', include("apps.study_groups.urls", namespace="study_groups_api")),
     path('docs/', schema_view.with_ui("swagger", cache_timeout=0), name="schema_view"),

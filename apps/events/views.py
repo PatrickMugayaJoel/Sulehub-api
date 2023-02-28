@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # local imports
 from .models import Event
-from schools.models import School
+from apps.schools.models import School
 from core.email_service import send_email
 from .serializers import EventSerializer, EventUpdateSerializer
 
