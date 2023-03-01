@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
-from apps.users.models import User
+from django.conf import settings
 
 
 class AutoDateTimeField(models.DateTimeField):
@@ -24,7 +24,7 @@ class School(models.Model):
     is_active = models.BooleanField(default=True)
     Bio = models.TextField(blank=True)
     DP = models.CharField(_('Display Picture'), max_length=100, blank=True)
-    manager = models.ForeignKey(User, to_field='id', on_delete=models.DO_NOTHING)
+    manager = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.DO_NOTHING)
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
 

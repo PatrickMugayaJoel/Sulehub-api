@@ -39,8 +39,8 @@ class UserManager(BaseUserManager):
     def get_queryset(self):
         return super(UserManager, self).get_queryset()
 
-    def get_by_natural_key(self, pk):
-        return self.get(pk=pk)
+    def get_by_natural_key(self, email):
+        return self.get(email=email)
 
 class AutoDateTimeField(models.DateTimeField):
     def pre_save(self, model_instance, add):
@@ -58,7 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('P', 'Publisher'),
     )
     
-    # id = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     username = models.CharField(max_length=80, blank=True)
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
@@ -72,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    role = models.CharField(max_length=1, choices=GENDER)
+    role = models.CharField(max_length=1, choices=GENDER, default="M")
     DP = models.CharField(_('Display Picture'), max_length=100, blank=True)
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
@@ -80,6 +80,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+    EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = ['email',]
 
     class Meta:
         ordering = ['first_name']

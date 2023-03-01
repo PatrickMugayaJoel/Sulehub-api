@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from apps.users.models import User
+from django.conf import settings
 
 
 class Resource(models.Model):
@@ -12,5 +12,5 @@ class Resource(models.Model):
     is_active = models.BooleanField(default=False)
     image = models.CharField(max_length=100, blank=True)
     _file = models.CharField(max_length=100, blank=True)
-    created_by = models.ForeignKey(User, to_field='id', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.CASCADE)
     created_on = models.DateTimeField(default=timezone.now)
