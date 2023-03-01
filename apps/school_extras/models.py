@@ -9,42 +9,37 @@ class AutoDateTimeField(models.DateTimeField):
     def pre_save(self, model_instance, add):
         return timezone.now()
 
+## Levels
+#############################################
 class LevelManager(models.Manager):
     def get_by_natural_key(self, id):
         return self.get(id=id)
 
-## Levels
-#############################################
 class Level(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
     short_name = models.CharField(max_length=5, blank=True)
+    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
     objects = LevelManager()
 
+    class Meta:
+        unique_together = ('name', 'short_name', 'school',)
+
+## Subjects
+#############################################
 class SubjectManager(models.Manager):
     def get_by_natural_key(self, id):
         return self.get(id=id)
 
-## Subjects
-#############################################
 class Subject(models.Model):
     id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=80, blank=True)
-    level = models.CharField(max_length=30, blank=True)
+    name = models.CharField(max_length=80, null=True, on_delete=models.SET_NULL)
     description = models.TextField(blank=True)
-    teacher = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', null=True, on_delete=models.SET_NULL) # TODO: show more than an id
-    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE) # TODO: show more than an id
-    created = models.DateTimeField(default=timezone.now)
-    updated = AutoDateTimeField(default=timezone.now)
+    Level = models.ForeignKey(Level, on_delete=models.CASCADE)
 
     objects = SubjectManager()
-
-    class Meta:
-        verbose_name = _('subject')
-        verbose_name_plural = _('subjects')
-        unique_together = ('name', 'level',)
 
 ## Teachers
 #############################################
@@ -55,7 +50,6 @@ class TeacherRegistration(models.Model):
     subjects = models.ManyToManyField(Subject)
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(default=timezone.now)
-    updated = AutoDateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ('teacher', 'school',)

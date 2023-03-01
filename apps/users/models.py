@@ -54,8 +54,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     ROLES = (
         ('T', 'Teacher'),
         ('S', 'Student'),
-        ('G', 'Guardian'), 
-        ('P', 'Publisher'),
+        # ('G', 'Guardian'),
+        # ('P', 'Publisher'),
     )
     
     id = models.BigAutoField(primary_key=True)
@@ -72,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    role = models.CharField(max_length=1, choices=GENDER, default="M")
+    role = models.CharField(max_length=1, choices=ROLES, blank=True)
     DP = models.CharField(_('Display Picture'), max_length=100, blank=True)
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
