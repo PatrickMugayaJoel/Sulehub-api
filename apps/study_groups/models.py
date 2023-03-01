@@ -5,7 +5,7 @@ from apps.schools.models import School
 
 
 class StudyGroup(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
     school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE)
     level = models.CharField(max_length=80, blank=True)
@@ -16,7 +16,7 @@ class StudyGroup(models.Model):
     created_on = models.DateTimeField(default=timezone.now)
 
 class GroupRegistration(models.Model):
-    member_id = models.AutoField(primary_key=True)
+    member_id = models.BigAutoField(primary_key=True)
     student = models.ForeignKey(User, to_field='id', on_delete=models.CASCADE) # TODO: show more than an id
     study_group = models.ForeignKey(StudyGroup, to_field='id', on_delete=models.CASCADE) # TODO: show more than an id
     is_active = models.BooleanField(default=True)

@@ -5,7 +5,7 @@ from apps.resources.models import Resource
 
 
 class Feedback(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     title = models.CharField(max_length=80, blank=True)
     category = models.CharField(max_length=80, blank=True) # feeds, feedback, review etc
     resource = models.ForeignKey(Resource, to_field='id', on_delete=models.CASCADE)

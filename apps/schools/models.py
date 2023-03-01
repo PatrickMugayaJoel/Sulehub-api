@@ -14,7 +14,7 @@ class SchoolManager(models.Manager):
         return self.get(school_id=school_id)
 
 class School(models.Model):
-    school_id = models.AutoField(primary_key=True)
+    school_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
     phone = PhoneNumberField(blank=True, unique=True)
     email = models.EmailField(unique=True)

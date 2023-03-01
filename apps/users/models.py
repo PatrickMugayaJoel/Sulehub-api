@@ -54,11 +54,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     ROLES = (
         ('T', 'Teacher'),
         ('S', 'Student'),
-        ('G', 'Guardian'),
+        ('G', 'Guardian'), 
         ('P', 'Publisher'),
     )
     
-    id = models.AutoField(primary_key=True)
+    # id = models.BigAutoField(primary_key=True)
     username = models.CharField(max_length=80, blank=True)
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)

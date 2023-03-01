@@ -5,7 +5,7 @@ from apps.schools.models import School
 
 
 class Event(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
     school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE)
     tags = models.TextField(blank=True)# json.dumps(x) json.loads(self.foo)

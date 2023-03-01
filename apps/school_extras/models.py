@@ -16,7 +16,7 @@ class LevelManager(models.Manager):
 ## Levels
 #############################################
 class Level(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
     short_name = models.CharField(max_length=5, blank=True)
     is_active = models.BooleanField(default=True)
@@ -30,7 +30,7 @@ class SubjectManager(models.Manager):
 ## Subjects
 #############################################
 class Subject(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
     level = models.CharField(max_length=30, blank=True)
     description = models.TextField(blank=True)
@@ -49,7 +49,7 @@ class Subject(models.Model):
 ## Teachers
 #############################################
 class TeacherRegistration(models.Model):
-    reg_id = models.AutoField(primary_key=True)
+    reg_id = models.BigAutoField(primary_key=True)
     teacher = models.ForeignKey(User, to_field='id', on_delete=models.CASCADE) # TODO: show more than an id
     school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE) # TODO: show more than an id
     subjects = models.ManyToManyField(Subject)
@@ -63,7 +63,7 @@ class TeacherRegistration(models.Model):
 ## Students
 #############################################
 class StudentRegistration(models.Model):
-    reg_id = models.AutoField(primary_key=True)
+    reg_id = models.BigAutoField(primary_key=True)
     student = models.ForeignKey(User, to_field='id', on_delete=models.CASCADE) # TODO: show more than an id
     school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE) # TODO: show more than an id
     level = models.ForeignKey(Level, null=True, on_delete=models.SET_NULL)

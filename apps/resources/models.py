@@ -4,7 +4,7 @@ from apps.users.models import User
 
 
 class Resource(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
     price = models.DecimalField(max_digits=12, decimal_places=2)
     tags = models.TextField(blank=True)
