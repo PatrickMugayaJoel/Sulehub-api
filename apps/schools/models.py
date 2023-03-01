@@ -16,8 +16,8 @@ class SchoolManager(models.Manager):
 class School(models.Model):
     school_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
-    phone = PhoneNumberField(blank=True, unique=True)
-    email = models.EmailField(unique=True, blank=True)
+    phone = PhoneNumberField(blank=True, null=True, unique=True)
+    email = models.EmailField(unique=True, null=True, blank=True)
     website = models.CharField(max_length=80, blank=True)
     country = models.CharField(max_length=30, blank=True)
     address = models.CharField(max_length=80, blank=True)

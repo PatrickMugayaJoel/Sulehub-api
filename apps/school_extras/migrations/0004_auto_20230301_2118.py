@@ -1,35 +1,15 @@
-from apps.users.models import User
-from apps.schools.models import School
-from apps.school_extras import (
-    Subject, TeacherRegistration,
-    StudentRegistration, Level
-)
-
-# r.article_set.count()
-# r.article_set.all()
-# r.article_set.filter(headline__startswith='This')
-# Article.objects.filter(reporter__first_name='John', reporter__last_name='Smith')
-# Article.objects.filter(reporter__in=[1,2]).distinct()
-# Article.objects.filter(reporter__in=Reporter.objects.filter(first_name='John')).distinct()
-# Reporter.objects.filter(article__headline__startswith='This').distinct().count()
-# Reporter.objects.filter(article__reporter__first_name__startswith='John')
-
-## many to many
-# a2.publications.add(p1, p2)
-# a1.publications.all()
-# p2.article_set.all()
-# Publication.objects.get(id=4).article_set.all()
-# Article.objects.filter(publications__id=1)
-
-# a4.publications.set([p3])
-# a4.publications.clear()
-# p2.article_set.clear()
-# p2.article_set.remove(a5)
-# p2.article_set.add(a4, a5)
-# Publication.objects.filter(title__startswith='Science').delete()
+from django.db import migrations
 
 
-def initial_db():
+def initial_db(apps, schema_editor):
+    User = apps.get_model('users', 'User')
+    School = apps.get_model('schools', 'School')
+    Level = apps.get_model('school_extras', 'Level')
+    Subject = apps.get_model('school_extras', 'Subject')
+    TeacherRegistration = apps.get_model('school_extras', 'TeacherRegistration')
+    StudentRegistration = apps.get_model('school_extras', 'StudentRegistration')
+
+
     ### users
     user1 = User(email='mugayajoelpatrick@gmail.com', role='T', password='pbkdf2_sha256$390000$I85twedg82lGW7uXg3lF9c$A6pGRL6xeMdmRYnVyb2wsasV4kUYMHSlhyH3rYdNlik=')
     user2 = User(email='mugayajoelpatrick2@gmail.com', role='T', password='pbkdf2_sha256$390000$I85twedg82lGW7uXg3lF9c$A6pGRL6xeMdmRYnVyb2wsasV4kUYMHSlhyH3rYdNlik=')
@@ -82,3 +62,15 @@ def initial_db():
 
     sReg1.subjects.set(sReg1.level.subject_set.all())
     sReg2.subjects.set(sReg2.level.subject_set.all())
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('schools', '0002_initial'),
+        ('school_extras', '0003_initial'),
+    ]
+
+    operations = [
+        migrations.RunPython(initial_db),
+    ]

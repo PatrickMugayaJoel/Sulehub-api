@@ -21,3 +21,7 @@ DEBUG=False
 DJANGO_SUPERUSER_EMAIL="admin@shulehub.com"
 SUPER_USER_NAME="admin"
 DJANGO_SUPERUSER_PASSWORD="admin"
+
+# required
+SECRET_KEY=
+ALLOWED_HOSTS=

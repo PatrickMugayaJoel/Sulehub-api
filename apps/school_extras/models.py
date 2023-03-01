@@ -35,7 +35,7 @@ class SubjectManager(models.Manager):
 
 class Subject(models.Model):
     id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=80, null=True, on_delete=models.SET_NULL)
+    name = models.CharField(max_length=80)
     description = models.TextField(blank=True)
     Level = models.ForeignKey(Level, on_delete=models.CASCADE)
 

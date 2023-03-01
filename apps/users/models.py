@@ -64,7 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     DoB = models.DateTimeField(_('Date of Birth'), null=True, blank=True)
-    contact = PhoneNumberField(blank=True, unique=True) # null=False
+    contact = PhoneNumberField(blank=True, null=True, unique=True)
     residence = models.CharField(max_length=80, blank=True)
     gender = models.CharField(max_length=1, choices=GENDER, blank=True)
     country = models.CharField(max_length=30, blank=True)
