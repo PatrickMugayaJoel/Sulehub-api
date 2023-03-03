@@ -24,7 +24,7 @@ class School(models.Model):
     is_active = models.BooleanField(default=True)
     Bio = models.TextField(blank=True)
     DP = models.CharField(_('Display Picture'), max_length=100, blank=True)
-    manager = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.DO_NOTHING)
+    manager = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.DO_NOTHING, related_name="schools")
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
 

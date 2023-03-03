@@ -54,6 +54,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         fields = ('email', 'username', 'first_name', 'last_name', 'role', 'DoB', 'contact', 'residence', 'gender', 'country', 'Bio')
 
 class UserListSerializer(serializers.ModelSerializer):
+    schools = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = User
