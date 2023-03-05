@@ -4,6 +4,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.core import serializers
+import json
 
 # local imports
 from .models import School
@@ -23,9 +25,10 @@ class ListSchoolsView(APIView):
         """
         try:
             schools = self.queryset.all()
-            school_serializer = self.serializer_class(schools, many=True)
+            data = json.loads(serializers.serialize('json', schools, use_natural_foreign_keys=True))
+            # school_serializer = self.serializer_class(schools, many=True)
             return Response({'status': True,
-                             'Response': school_serializer.data},
+                             'Response': data},
                             status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
@@ -42,9 +45,11 @@ class GetSchoolView(APIView):
     def get(self, request, school_id=None):
         try:
             school = self.queryset.get(pk=int(school_id))
-            school_serializer = self.serializer_class(school, many=False)
-            return Response({'status': True,
-                             'Response': school_serializer.data}, status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', [school,], use_natural_foreign_keys=True))[0]
+            return Response({
+                'status': True,
+                'Response': data},
+                status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False,
                              'message': str(e)},

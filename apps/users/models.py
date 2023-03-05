@@ -39,8 +39,8 @@ class UserManager(BaseUserManager):
     def get_queryset(self):
         return super(UserManager, self).get_queryset()
 
-    def get_by_natural_key(self, email):
-        return self.get(email=email)
+    # def get_by_natural_key(self, email):
+    #     return self.get(email=email)
 
 class AutoDateTimeField(models.DateTimeField):
     def pre_save(self, model_instance, add):
@@ -97,8 +97,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-    # def natural_key(self): # or def get_natural_key(self):
-    #     return (self.first_name, self.last_name)
+    def natural_key(self):
+        return {"first_name": self.first_name, "last_name": self.last_name, "email":self.email, "contact": self.contact,
+            "gender": self.gender, "country": self.country, "residence": self.residence, "DP": self.DP, "Bio": self.Bio
+        }
 
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):

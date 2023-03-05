@@ -5,6 +5,9 @@ from rest_framework import status
 from apps.users.models import User
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.core import serializers
+import json
+from apps.utils import JsonEncoder
 
 # local imports
 from .models import Subject , TeacherRegistration, StudentRegistration
@@ -262,8 +265,9 @@ class ListStudentsView(APIView):
     def get(self, request, school_id):
         try:
             students = StudentRegistration.objects.filter(school=school_id, is_active=True)
-            students_serializer = StudentsSerializer(students, many=True)
-            return Response({'status': True, 'Response': students_serializer.data}, status=status.HTTP_200_OK)
+            # students_serializer = StudentsSerializer(students, many=True)
+            data = json.loads(serializers.serialize('json', students, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -288,13 +292,12 @@ class ListStudentSubjectsView(APIView):
     __doc__ = "List a Student's subjects in a specific school."
 
     @swagger_auto_schema(tags=["Students"])
-    def get(self, request, school_id, member_id):
+    def get(self, request, reg_id):
         try:
-            student_reg_obj = StudentRegistration.objects.get(pk=int(member_id))
+            student_reg_obj = StudentRegistration.objects.get(pk=int(reg_id))
             if not (student_reg_obj and student_reg_obj.is_active):
                 return Response({'status': True, 'Response': []}, status=status.HTTP_200_OK)
-            student_subjects = Subject.objects.filter(school=school_id, level=student_reg_obj.level)
-            subject_serializer = SubjectSerializer(student_subjects, many=True)
+            subject_serializer = SubjectSerializer(student_reg_obj.subjects, many=True)
             return Response({'status': True,
                              'Response': subject_serializer.data},
                             status=status.HTTP_200_OK)

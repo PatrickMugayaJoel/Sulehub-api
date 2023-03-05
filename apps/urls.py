@@ -11,7 +11,7 @@ from apps.school_extras.views import (
     AddSubjectView, UpdateSubjectView,
     GetSubjectView, AddTeacherView,
     UpdateTeacherView, ListTeachersRegistrationsView,
-    ListStudentsRegistrationsView
+    ListStudentsRegistrationsView, ListStudentSubjectsView
 )
 
 
@@ -26,6 +26,7 @@ urlpatterns = [
     path('students/<int:student_id>/school_registrations/', ListStudentsRegistrationsView.as_view(), name='student_sch_registrations'),
     path('students/<int:student_id>/study_group_registrations/', StudentStudyGroupRegsView.as_view(), name='student_stdy_grp_registrations'),
     path('students/<int:member_id>/update/', UpdateStudentView.as_view(), name='update_student'),
+    path('students/<int:reg_id>/subjects/', ListStudentSubjectsView.as_view(), name='get_student_subjects'),
     path('teachers/register/', AddTeacherView.as_view(), name='register_teacher'),
     path('teachers/<int:teacher_id>/registrations/', ListTeachersRegistrationsView.as_view(), name='teacher_registrations'),
     path('teachers/<int:teacher_reg_id>/update/', UpdateTeacherView.as_view(), name='update_teacher'),

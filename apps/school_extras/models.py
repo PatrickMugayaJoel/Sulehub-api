@@ -11,10 +11,6 @@ class AutoDateTimeField(models.DateTimeField):
 
 ## Levels
 #############################################
-class LevelManager(models.Manager):
-    def get_by_natural_key(self, id):
-        return self.get(id=id)
-
 class Level(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
@@ -22,24 +18,22 @@ class Level(models.Model):
     school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
-    objects = LevelManager()
+    def natural_key(self):
+        return {"id":self.id, "name":self.name, "short_name":self.short_name, "school":self.school}
 
     class Meta:
         unique_together = ('name', 'short_name', 'school',)
 
 ## Subjects
 #############################################
-class SubjectManager(models.Manager):
-    def get_by_natural_key(self, id):
-        return self.get(id=id)
-
 class Subject(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80)
     description = models.TextField(blank=True)
-    Level = models.ForeignKey(Level, on_delete=models.CASCADE)
+    level = models.ForeignKey(Level, on_delete=models.CASCADE)
 
-    objects = SubjectManager()
+    def natural_key(self):
+        return {"id":self.id, "name":self.name, "level":self.level, "description":self.description}
 
 ## Teachers
 #############################################
@@ -54,12 +48,15 @@ class TeacherRegistration(models.Model):
     class Meta:
         unique_together = ('teacher', 'school',)
 
+    def natural_key(self, id):
+        return {"reg_id":self.reg_id, "teacher":self.teacher, "school":self.school, "subjects":self.subjects}
+
 ## Students
 #############################################
 class StudentRegistration(models.Model):
     reg_id = models.BigAutoField(primary_key=True)
-    student = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.CASCADE) # TODO: show more than an id
-    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE) # TODO: show more than an id
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.CASCADE)
+    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE)
     level = models.ForeignKey(Level, null=True, on_delete=models.SET_NULL)
     academic_year = models.CharField(_("Academic Year"), max_length=30, null=True)
     subjects = models.ManyToManyField(Subject)
@@ -69,3 +66,8 @@ class StudentRegistration(models.Model):
 
     class Meta:
         unique_together = ('academic_year', 'level', 'student')
+
+    def natural_key(self, id):
+        return {"reg_id":self.reg_id, "student":self.student, "school":self.school, "level":self.level,
+        "academic_year":self.academic_year, "subjects":self.subjects
+    }

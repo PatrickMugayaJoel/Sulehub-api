@@ -7,8 +7,7 @@ from .views import (
     ListTeacherStudentsView,
     ListTeacherSubjectsView,
     ## Students
-    ListStudentsView,
-    ListStudentSubjectsView
+    ListStudentsView
 )
 
 app_name = 'subjects'
@@ -24,5 +23,4 @@ urlpatterns = [
 
     ## Students
     path('students/', ListStudentsView.as_view(), name='list_students'),
-    path('students/<int:member_id>/subjects/', ListStudentSubjectsView.as_view(), name='get_student_subjects'),
 ]

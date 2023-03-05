@@ -9,10 +9,6 @@ class AutoDateTimeField(models.DateTimeField):
     def pre_save(self, model_instance, add):
         return timezone.now()
 
-class SchoolManager(models.Manager):
-    def get_by_natural_key(self, school_id):
-        return self.get(school_id=school_id)
-
 class School(models.Model):
     school_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
@@ -24,11 +20,14 @@ class School(models.Model):
     is_active = models.BooleanField(default=True)
     Bio = models.TextField(blank=True)
     DP = models.CharField(_('Display Picture'), max_length=100, blank=True)
-    manager = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.DO_NOTHING, related_name="schools")
+    manager = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.DO_NOTHING)
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
 
-    objects = SchoolManager()
+    def natural_key(self):
+        return {"school_id":self.school_id, "name":self.name, "phone":self.phone, "email":self.email, "website":self.website,
+        "country":self.country, "address":self.address, "DP":self.DP, "Bio":self.Bio, "manager":self.manager
+    }
 
     class Meta:
         verbose_name = _('school')

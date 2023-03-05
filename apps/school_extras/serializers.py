@@ -10,7 +10,7 @@ from .models import Subject, TeacherRegistration, StudentRegistration
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
-        fields = ('id', 'name', 'level', 'description', 'teacher', 'school')
+        fields = ('id', 'name', 'level', 'description',)
 
 class SubjectUpdateSerializer(serializers.ModelSerializer):
 
@@ -21,20 +21,20 @@ class SubjectUpdateSerializer(serializers.ModelSerializer):
         instance.name = validated_data['name']
         instance.level = validated_data['level']
         instance.description = validated_data['description']
-        instance.teacher = validated_data['teacher']
         instance.save()
         return instance
 
     class Meta:
         model = Subject
-        fields = ('name', 'level', 'description', 'teacher')
+        fields = ('name', 'level', 'description',)
 
 ## Teachers
 #############################################
 class TeachersSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherRegistration
-        fields = ('reg_id', 'teacher', 'school', 'is_active', 'created', 'updated')
+        fields = ('reg_id', 'teacher', 'school', 'is_active', 'created', 'subjects')
+        extra_kwargs = {'created':{'read_only':True}}
 
 class TeachersUpdateSerializer(serializers.ModelSerializer):
 
@@ -55,9 +55,8 @@ class TeachersUpdateSerializer(serializers.ModelSerializer):
 class StudentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentRegistration
-        fields = ('reg_id', 'student', 'school', 'level', 'academic_year', 'is_active', 'created', 'updated')
-        extra_kwargs = {'password':{'read_only':True}, 'created':{'read_only':True},
-            'updated':{'read_only':True}, 'is_active':{'read_only':True}}
+        fields = ('reg_id', 'student', 'school', 'level', 'academic_year', 'subjects', 'is_active', 'created', 'updated',)
+        extra_kwargs = {'created':{'read_only':True}, 'updated':{'read_only':True}, 'is_active':{'read_only':True}}
 
 class StudentsUpdateSerializer(serializers.ModelSerializer):
 
@@ -74,4 +73,4 @@ class StudentsUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StudentRegistration
-        fields = ('school', 'level', 'academic_year', 'is_active')
+        fields = ('school', 'level', 'academic_year', 'is_active',)
