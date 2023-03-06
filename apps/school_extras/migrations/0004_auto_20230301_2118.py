@@ -37,12 +37,13 @@ def initial_db(apps, schema_editor):
     ### subjects
     subject1 = Subject(name='Biology', Level=level1)
     subject2 = Subject(name='Chemistry', Level=level1)
-    subject3 = Subject(name='Physics', Level=level1)
-    subject4 = Subject(name='Literature', Level=level1)
     subject1.save()
     subject2.save()
-    subject3.save()
-    subject4.save()
+
+    subject3 = Subject(name='Physics')
+    subject4 = Subject(name='Literature')
+    level1.subject_set.add(subject3)
+    level1.subject_set.add(subject4)
 
     ### teacherRegistrations
     tReg1 = TeacherRegistration(teacher=user1, school=school1)
