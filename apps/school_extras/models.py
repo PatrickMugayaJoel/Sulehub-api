@@ -39,10 +39,10 @@ class Subject(models.Model):
 #############################################
 class TeacherRegistration(models.Model):
     reg_id = models.BigAutoField(primary_key=True)
-    teacher = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.CASCADE) # TODO: show more than an id
-    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE) # TODO: show more than an id
+    teacher = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.CASCADE)
+    school = models.ForeignKey(School, to_field='school_id', on_delete=models.CASCADE)
     subjects = models.ManyToManyField(Subject)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     created = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -60,7 +60,7 @@ class StudentRegistration(models.Model):
     level = models.ForeignKey(Level, null=True, on_delete=models.SET_NULL)
     academic_year = models.CharField(_("Academic Year"), max_length=30, null=True)
     subjects = models.ManyToManyField(Subject)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     created = models.DateTimeField(default=timezone.now)
     updated = AutoDateTimeField(default=timezone.now)
 

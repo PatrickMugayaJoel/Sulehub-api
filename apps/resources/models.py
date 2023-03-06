@@ -7,7 +7,7 @@ class Resource(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80, blank=True)
     price = models.DecimalField(max_digits=12, decimal_places=2)
-    tags = models.TextField(blank=True)
+    tags = models.CharField(max_length=150, blank=True)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=False)
     image = models.CharField(max_length=100, blank=True)

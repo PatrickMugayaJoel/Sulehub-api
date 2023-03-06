@@ -1,3 +1,6 @@
+
+## for expiring download, see: https://github.com/yunojuno/django-request-token
+
 import os
 import magic
 from django.core.files.storage import default_storage
