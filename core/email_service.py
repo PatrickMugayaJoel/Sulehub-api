@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 import threading
 
 from custom_logger import CustomLogger
@@ -16,11 +16,12 @@ def send_email(**kargs):
         if request:
             recipient_list = [request.user.email,]
         else:
-            return
+            raise Exception("No recipients!")
 
     subject = kargs.get("subject") or 'welcome to shulehub'
     message = kargs.get("message") or 'Hi, thank you for choosing shulehub.'
     template_data = messages(kargs.get("template"), kargs)
+    bcc_list = kargs.get("bcc_list")
 
     if template_data:
         subject = template_data["subject"]
@@ -28,7 +29,12 @@ def send_email(**kargs):
 
     try:
         email_from = settings.EMAIL_HOST_USER
-        thread = threading.Thread(target=send_mail, args=[subject, message, email_from, recipient_list])
+        email = EmailMessage(subject, message, email_from, recipient_list, bcc_list,
+            reply_to=[request.user.email, settings.EMAIL_HOST_USER,],
+            headers={},
+        )
+        email.content_subtype = "html"
+        thread = threading.Thread(target=email.send, args=[])
         thread.start()
     except Exception as e:
         print("ERROR: ",e)

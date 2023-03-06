@@ -10,6 +10,7 @@ from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
+from drf_yasg.utils import swagger_auto_schema
 
 # local imports
 from .models import User
@@ -20,6 +21,9 @@ from .serializers import (
     UserUpdateSerializer
 )
 from core.upload_service import upload
+from core.email_service import send_email
+from apps.events.models import Invitation
+from apps.events.serializers import InvitationSerializer
 
 
 class RegistrationAPIView(CreateAPIView):
@@ -28,6 +32,7 @@ class RegistrationAPIView(CreateAPIView):
 
     __doc__ = "Registration API for user"
 
+    @swagger_auto_schema(tags=["Users"])
     def post(self, request, *args, **kwargs):
         try:
             user_serializer = self.serializer_class(data=request.data)
@@ -53,6 +58,7 @@ class LoginView(APIView):
     __doc__ = "Log In API for user which returns token"
 
     @staticmethod
+    @swagger_auto_schema(tags=["Users"])
     def post(request):
         try:
             serializer = TokenObtainSerializer(data=request.data)
@@ -81,6 +87,7 @@ class LogoutView(APIView):
     __doc__ = "Logout API for user"
 
     @staticmethod
+    @swagger_auto_schema(tags=["Users"])
     def post(request):
         try:
             # user = request.user
@@ -92,6 +99,69 @@ class LogoutView(APIView):
             return Response({'status': False},
                             status=status.HTTP_400_BAD_REQUEST)
 
+class InvitationsView(APIView):
+    
+    __doc__ = "User Invitation API"
+
+    @staticmethod
+    @swagger_auto_schema(tags=["Users"])
+    def post(request):
+        try:
+            invitation_serializer = InvitationSerializer(data=request.data)
+            if invitation_serializer.is_valid():
+                invitation = invitation_serializer.save()
+                send_email(
+                    request=request,
+                    template="INVITE_A_USER",
+                    SCHOOL_NAME=invitation.school.name,
+                    INVITE_ID=invitation.id,
+                    USER_TYPE=invitation.user_type,
+                    recipient_list=[invitation.email,]
+                )
+                return Response({
+                    'message': "Invitation successfully sent.",
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'status': False,
+                                 'message': ','.join(invitation_serializer.errors.values())},
+                                status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response({'status': False,'message': "Error sending Invitation!"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class ListInvitationsView(APIView):
+    permission_classes = (IsAuthenticated,)
+    __doc__ = "List invitations."
+
+    @swagger_auto_schema(tags=["Users"])
+    def get(self, request):
+        try:
+            invites = Invitation.objects.filter(school__pk=request.data.get('school'),
+                                                email=request.data.get('email'), is_active=True)
+            invites_serializer = InvitationSerializer(invites, many=True)
+            return Response({'status': True,
+                             'Response': invites_serializer.data},
+                            status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class GetInvitationView(APIView):
+    permission_classes = (IsAuthenticated,)
+    __doc__ = "GET API for invitation"
+
+    @swagger_auto_schema(tags=["Schools"])
+    def get(self, request, invite_id=None):
+        try:
+            invites = Invitation.objects.get(pk=int(invite_id))
+            invites_serializer = InvitationSerializer(invites, many=False)
+            return Response({'status': True,
+                             'Response': invites_serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False,
+                             'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
 class GetUserAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserListSerializer
@@ -99,6 +169,7 @@ class GetUserAPIView(APIView):
 
     __doc__ = "Get User Profile"
 
+    @swagger_auto_schema(tags=["Users"])
     def get(self, request, user_id=None):
         try:
             user = self.queryset.get(pk=int(user_id))
@@ -113,6 +184,7 @@ class UserAPIView(APIView):
     serializer_class = UserListSerializer
     permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(tags=["Users"])
     def get(self, request):
         """
         List all the users.
@@ -135,6 +207,7 @@ class UserDPUploadView(APIView):
     __doc__ = "Update user display picture"
 
     @staticmethod
+    @swagger_auto_schema(tags=["Users"])
     def post(request):
         try:
             if not request.FILES.get('file'):
@@ -162,6 +235,7 @@ class UpdateAPIView(UpdateAPIView):
 
     __doc__ = "Profile Update API for user"
 
+    @swagger_auto_schema(tags=["Users"])
     def update(self, request, *args, **kwargs):
         try:
             user = self.request.user
@@ -189,6 +263,7 @@ class ChangePasswordView(UpdateAPIView):
 
     __doc__ = "An endpoint for changing password."
 
+    @swagger_auto_schema(tags=["Users"])
     def update(self, request, *args, **kwargs):
         self.object = self.request.user
         serializer = self.get_serializer(data=request.data)

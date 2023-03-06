@@ -25,3 +25,6 @@ DJANGO_SUPERUSER_PASSWORD="admin"
 # required
 SECRET_KEY='6%hc3+^4=3phyx=86dqp%kl!g850jsv1keaw4u7tv(b&k_d324'
 ALLOWED_HOSTS='localhost,127.0.0.1'
+
+FRONTEND_DOMAIN='FRONTEND_DOMAIN'
+FRONTEND_INVITE_URL='/invitations'
