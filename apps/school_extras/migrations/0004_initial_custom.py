@@ -5,6 +5,7 @@ from django.conf import settings
 def initial_db(apps, schema_editor):
     User = apps.get_model('users', 'User')
     School = apps.get_model('schools', 'School')
+    Invitation = apps.get_model('events', 'Invitation')
     Level = apps.get_model('school_extras', 'Level')
     Subject = apps.get_model('school_extras', 'Subject')
     TeacherRegistration = apps.get_model('school_extras', 'TeacherRegistration')
@@ -53,6 +54,12 @@ def initial_db(apps, schema_editor):
 
     tReg1.subjects.set([subject1, subject2])
     tReg1.subjects.add(subject3, subject4)
+
+    ### invitations
+    invite1 = Invitation(email='mugayajoelpatrick@gmail.com', user_type='teacher', school=school2)
+    invite2 = Invitation(email='jmugaya@nic.co.ug', user_type='student', school=school2)
+    invite1.save()
+    invite2.save()
 
     ### StudentRegistration
     sReg1 = StudentRegistration(student=user3, school=school1, level=level1)
@@ -113,7 +120,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('schools', '0002_initial'),
         ('school_extras', '0003_initial'),
-        ('events', '0002_initial'),
+        ('events', '0003_initial'),
         ('feedback', '0002_initial'),
         ('resources', '0002_initial'),
         ('sales', '0002_initial'),
