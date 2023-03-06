@@ -206,8 +206,8 @@ class UserDPUploadView(APIView):
 
     __doc__ = "Update user display picture"
 
-    @staticmethod
     @swagger_auto_schema(tags=["Users"])
+    @staticmethod
     def post(request):
         try:
             if not request.FILES.get('file'):

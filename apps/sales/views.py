@@ -4,6 +4,9 @@ from rest_framework.views import APIView
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import json
+from apps.utils import JsonEncoder
+from django.core import serializers
 
 # local imports
 from .models import Sale
@@ -19,13 +22,10 @@ class ListSalesView(APIView):
     def get(self, request):
         try:
             sales = Sale.objects.all()
-            sale_serializer = SaleSerializer(sales, many=True)
-            return Response({'status': True,
-                             'Response': sale_serializer.data},
-                            status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', sales, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False, 'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ListResourceSalesView(APIView):
     permission_classes = (AllowAny,)
@@ -34,15 +34,11 @@ class ListResourceSalesView(APIView):
     @swagger_auto_schema(tags=["Sales"])
     def get(self, request, resource_id):
         try:
-            resource = Resource.objects.get(pk=resource_id)
-            sales = Sale.objects.filter(resource=resource)
-            sale_serializer = SaleSerializer(sales, many=True)
-            return Response({'status': True,
-                             'Response': sale_serializer.data},
-                            status=status.HTTP_200_OK)
+            sales = Sale.objects.filter(resource=resource_id)
+            data = json.loads(serializers.serialize('json', sales, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False, 'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetSaleView(APIView):
     permission_classes = (AllowAny,)
@@ -52,9 +48,8 @@ class GetSaleView(APIView):
     def get(self, request, sale_id=None):
         try:
             sale = Sale.objects.get(pk=int(sale_id))
-            sale_serializer = SaleSerializer(sale, many=False)
-            return Response({'status': True,
-                             'Response': sale_serializer.data}, status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', [sale,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False,
                              'message': str(e)},

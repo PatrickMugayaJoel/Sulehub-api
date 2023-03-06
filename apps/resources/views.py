@@ -4,6 +4,9 @@ from rest_framework.views import APIView
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import json
+from apps.utils import JsonEncoder
+from django.core import serializers
 
 # local imports
 from .models import Resource
@@ -19,13 +22,10 @@ class ListResourcesView(APIView):
     def get(self, request):
         try:
             resources = Resource.objects.all()
-            resource_serializer = ResourceSerializer(resources, many=True)
-            return Response({'status': True,
-                             'Response': resource_serializer.data},
-                            status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', resources, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False, 'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetResourceView(APIView):
     permission_classes = (AllowAny,)
@@ -35,13 +35,10 @@ class GetResourceView(APIView):
     def get(self, request, resource_id=None):
         try:
             resource = Resource.objects.get(pk=int(resource_id))
-            resource_serializer = ResourceSerializer(resource, many=False)
-            return Response({'status': True,
-                             'Response': resource_serializer.data}, status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', [resource,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False,
-                             'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class CreateResourceView(APIView):
     permission_classes = (IsAuthenticated,)

@@ -5,9 +5,9 @@ from rest_framework import status
 from apps.users.models import User
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.core import serializers
 import json
 from apps.utils import JsonEncoder
+from django.core import serializers
 
 # local imports
 from .models import Subject , TeacherRegistration, StudentRegistration
@@ -265,7 +265,6 @@ class ListStudentsView(APIView):
     def get(self, request, school_id):
         try:
             students = StudentRegistration.objects.filter(school=school_id, is_active=True)
-            # students_serializer = StudentsSerializer(students, many=True)
             data = json.loads(serializers.serialize('json', students, use_natural_foreign_keys=True, cls=JsonEncoder))
             return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:

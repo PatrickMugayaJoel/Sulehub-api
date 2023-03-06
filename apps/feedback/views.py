@@ -3,6 +3,9 @@ from rest_framework.views import APIView
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
+import json
+from apps.utils import JsonEncoder
+from django.core import serializers
 
 # local imports
 from .models import Feedback
@@ -19,13 +22,10 @@ class ListFeedbackView(APIView):
     def get(self, request):
         try:
             feedback = Feedback.objects.all()
-            feedback_serializer = FeedbackSerializer(feedback, many=True)
-            return Response({'status': True,
-                             'Response': feedback_serializer.data},
-                            status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', feedback, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False, 'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ListResourceFeedbackView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -34,15 +34,11 @@ class ListResourceFeedbackView(APIView):
     @swagger_auto_schema(tags=["Feedback"])
     def get(self, request, resource_id):
         try:
-            resource = Resource.objects.get(pk=resource_id)
-            feedback = Feedback.objects.filter(resource=resource)
-            feedback_serializer = FeedbackSerializer(feedback, many=True)
-            return Response({'status': True,
-                             'Response': feedback_serializer.data},
-                            status=status.HTTP_200_OK)
+            feedback = Feedback.objects.filter(resource=int(resource_id))
+            data = json.loads(serializers.serialize('json', feedback, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False, 'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetFeedbackView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -52,9 +48,8 @@ class GetFeedbackView(APIView):
     def get(self, request, feedback_id=None):
         try:
             feedback = Feedback.objects.get(pk=int(feedback_id))
-            feedback_serializer = FeedbackSerializer(feedback, many=False)
-            return Response({'status': True,
-                             'Response': feedback_serializer.data}, status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', [feedback,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False,
                              'message': str(e)},

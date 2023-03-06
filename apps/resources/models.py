@@ -14,3 +14,8 @@ class Resource(models.Model):
     _file = models.CharField(max_length=100, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.CASCADE)
     created_on = models.DateTimeField(default=timezone.now)
+
+    def natural_key(self):
+        return {"id": self.id, "name": self.name, "price": self.price, "tags":self.tags, "description": self.description,
+            "is_active": self.is_active, "image": self.image, "_file": self._file, "created_by": self.created_by
+        }

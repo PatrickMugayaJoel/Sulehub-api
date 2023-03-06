@@ -5,8 +5,8 @@ from .models import StudyGroup, GroupRegistration
 class StudyGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudyGroup
-        fields = ('id', 'name', 'school', 'tags', 'description', 'level', 'is_active', 'created_on', 'created_by')
-        extra_kwargs = {'created_on':{'read_only':True},} # TODO: created_by: should be auto added and a read_only
+        fields = ('id', 'name', 'tags', 'description', 'level', 'is_active', 'created_on', 'created_by')
+        extra_kwargs = {'created_on':{'read_only':True},}
 
 class StudyGroupUpdateSerializer(serializers.ModelSerializer):
 
@@ -15,7 +15,6 @@ class StudyGroupUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.name = validated_data['name']
-        instance.school = validated_data['school']
         instance.tags = validated_data['tags']
         instance.is_active = validated_data['is_active']
         instance.description = validated_data['description']
@@ -25,7 +24,7 @@ class StudyGroupUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StudyGroup
-        fields = ('name', 'school', 'description', 'tags', 'is_active',)
+        fields = ('name', 'description', 'tags', 'is_active',)
 
 ## Group Registrations
 #############################################
