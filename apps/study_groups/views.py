@@ -3,6 +3,9 @@ from rest_framework.views import APIView
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import json
+from apps.utils import JsonEncoder
+from django.core import serializers
 
 # local imports
 from .models import StudyGroup, GroupRegistration
@@ -22,10 +25,8 @@ class ListStudyGroupsView(APIView):
     def get(self, request):
         try:
             study_groups = StudyGroup.objects.all()
-            study_group_serializer = StudyGroupSerializer(study_groups, many=True)
-            return Response({'status': True,
-                             'Response': study_group_serializer.data},
-                            status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', study_groups, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -38,33 +39,23 @@ class GetStudyGroupView(APIView):
     def get(self, request, study_group_id=None):
         try:
             study_group = StudyGroup.objects.get(pk=int(study_group_id))
-            study_group_serializer = StudyGroupSerializer(study_group, many=False)
-            return Response({'status': True,
-                             'Response': study_group_serializer.data}, status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', [study_group,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False,
-                             'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetStudyGroupMembersView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "GET API for Study Groups Members"
 
     @swagger_auto_schema(tags=["Study Groups"])
-    def get(self, request, study_group_id=None):
+    def get(self, request, study_group_id=0):
         try:
-            study_group = StudyGroup.objects.get(pk=int(study_group_id))
-            study_group_registrations = GroupRegistration.objects.filter(study_group=study_group)
-            study_group_members = []
-            for registration in study_group_registrations:
-                study_group_members.append(registration.student)
-            study_group_serializer = UserCreateSerializer(study_group_members, many=True)
-            return Response({'status': True,
-                             'Response': study_group_serializer.data}, status=status.HTTP_200_OK)
+            study_group_registrations = GroupRegistration.objects.filter(study_group=int(study_group_id))
+            data = json.loads(serializers.serialize('json', study_group_registrations, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False,
-                             'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class CreateStudyGroupView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -191,15 +182,8 @@ class StudentStudyGroupRegsView(APIView):
     @swagger_auto_schema(tags=["Study Groups"])
     def get(self, request, student_id=None):
         try:
-            study_group_regs = GroupRegistration.objects.filter(student=int(student_id))
-            filtered_regs = []
-            for study_group_reg in study_group_regs: ## returning only what the user is permited to view
-                if ((study_group_reg.study_group.created_by == request.user) or (request.user == study_group_reg.student)):
-                    filtered_regs.append(study_group_reg)
-            study_group_serializer = GroupRegistrationSerializer(filtered_regs, many=True)
-            return Response({'status': True,
-                             'Response': study_group_serializer.data}, status=status.HTTP_200_OK)
+            study_group_registrations = GroupRegistration.objects.filter(student=int(student_id))
+            data = json.loads(serializers.serialize('json', study_group_registrations, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False,
-                             'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)

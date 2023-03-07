@@ -62,8 +62,8 @@ def initial_db(apps, schema_editor):
     invite2.save()
 
     ### StudentRegistration
-    sReg1 = StudentRegistration(student=user3, school=school1, level=level1)
-    sReg2 = StudentRegistration(student=user4, school=school1, level=level2)
+    sReg1 = StudentRegistration(student=user3, school=school1, level=level1, is_active=True)
+    sReg2 = StudentRegistration(student=user4, school=school1, level=level2, is_active=True)
     sReg1.save()
     sReg2.save()
 

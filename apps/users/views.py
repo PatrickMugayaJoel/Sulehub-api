@@ -150,7 +150,7 @@ class GetInvitationView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "GET API for invitation"
 
-    @swagger_auto_schema(tags=["Schools"])
+    @swagger_auto_schema(tags=["Users"])
     def get(self, request, invite_id=None):
         try:
             invites = Invitation.objects.get(pk=int(invite_id))
@@ -165,15 +165,30 @@ class GetInvitationView(APIView):
 class GetUserAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserListSerializer
-    queryset = User.objects.all()
 
-    __doc__ = "Get User Profile"
+    __doc__ = "Get User by id"
 
     @swagger_auto_schema(tags=["Users"])
-    def get(self, request, user_id=None):
+    def get(self, request, user_id=0):
         try:
-            user = self.queryset.get(pk=int(user_id))
+            user = User.objects.get(pk=int(user_id))
             user_serializer = self.serializer_class(user)
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False,
+                             'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class GetUserEmailView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    __doc__ = "Get User email"
+
+    @swagger_auto_schema(tags=["Users"])
+    def get(self, request, email=None):
+        try:
+            user = User.objects.get(email=email)
+            user_serializer = UserListSerializer(user)
             return Response(user_serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False,
