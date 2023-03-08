@@ -32,7 +32,7 @@ class GetResourceView(APIView):
     __doc__ = "GET API for resource"
 
     @swagger_auto_schema(tags=["Resources"])
-    def get(self, request, resource_id=None):
+    def get(self, request, resource_id=0):
         try:
             resource = Resource.objects.get(pk=int(resource_id))
             data = json.loads(serializers.serialize('json', [resource,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]

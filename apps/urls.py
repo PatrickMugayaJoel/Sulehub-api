@@ -8,8 +8,8 @@ from .swagger import schema_view
 from apps.study_groups.views import StudentStudyGroupRegsView
 from apps.school_extras.views import (
     AddStudentView, UpdateStudentView,
-    AddSubjectView, UpdateSubjectView,
-    GetSubjectView, AddTeacherView,
+    AddSubjectView, UpdateSubjectView, GetLevelView,
+    GetSubjectView, AddTeacherView, UpdateLevelView,
     UpdateTeacherView, ListTeachersRegistrationsView,
     ListStudentsRegistrationsView, ListStudentSubjectsView
 )
@@ -30,6 +30,8 @@ urlpatterns = [
     path('teachers/register/', AddTeacherView.as_view(), name='register_teacher'),
     path('teachers/<int:teacher_id>/registrations/', ListTeachersRegistrationsView.as_view(), name='teacher_registrations'),
     path('teachers/<int:teacher_reg_id>/update/', UpdateTeacherView.as_view(), name='update_teacher'),
+    path('levels/<int:level_id>/', GetLevelView.as_view(), name='get_level'),
+    path('levels/<int:level_id>/update/', UpdateLevelView.as_view(), name='update_level'),
     path('schools/', include("apps.schools.urls", namespace="schools_api")),
     path('events/', include("apps.events.urls", namespace="events_api")),
     path('feedback/', include("apps.feedback.urls", namespace="feedback_api")),

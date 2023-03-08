@@ -11,6 +11,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from drf_yasg.utils import swagger_auto_schema
+import json
+from apps.utils import JsonEncoder
+from django.core import serializers
 
 # local imports
 from .models import User
@@ -99,7 +102,7 @@ class LogoutView(APIView):
             return Response({'status': False},
                             status=status.HTTP_400_BAD_REQUEST)
 
-class InvitationsView(APIView):
+class InvitationsCreateView(APIView):
     
     __doc__ = "User Invitation API"
 
@@ -129,38 +132,18 @@ class InvitationsView(APIView):
             return Response({'status': False,'message': "Error sending Invitation!"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-class ListInvitationsView(APIView):
-    permission_classes = (IsAuthenticated,)
-    __doc__ = "List invitations."
-
-    @swagger_auto_schema(tags=["Users"])
-    def get(self, request):
-        try:
-            invites = Invitation.objects.filter(school__pk=request.data.get('school'),
-                                                email=request.data.get('email'), is_active=True)
-            invites_serializer = InvitationSerializer(invites, many=True)
-            return Response({'status': True,
-                             'Response': invites_serializer.data},
-                            status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'status': False, 'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
-
 class GetInvitationView(APIView):
     permission_classes = (IsAuthenticated,)
     __doc__ = "GET API for invitation"
 
     @swagger_auto_schema(tags=["Users"])
-    def get(self, request, invite_id=None):
+    def get(self, request, invite_id=0):
         try:
             invites = Invitation.objects.get(pk=int(invite_id))
-            invites_serializer = InvitationSerializer(invites, many=False)
-            return Response({'status': True,
-                             'Response': invites_serializer.data}, status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', [invites,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False,
-                             'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetUserAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -243,7 +226,7 @@ class UserDPUploadView(APIView):
                             'message': str(e),},
                             status=status.HTTP_400_BAD_REQUEST)
 
-class UpdateAPIView(UpdateAPIView):
+class UpdateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     model = User
     serializer_class = UserUpdateSerializer
@@ -251,7 +234,7 @@ class UpdateAPIView(UpdateAPIView):
     __doc__ = "Profile Update API for user"
 
     @swagger_auto_schema(tags=["Users"])
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         try:
             user = self.request.user
             user_serializer = self.serializer_class(user, data=request.data)
@@ -271,7 +254,7 @@ class UpdateAPIView(UpdateAPIView):
                              'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
-class ChangePasswordView(UpdateAPIView):
+class ChangePasswordView(APIView):
     serializer_class = ChangePasswordSerializer
     model = User
     permission_classes = (IsAuthenticated,)
@@ -279,7 +262,7 @@ class ChangePasswordView(UpdateAPIView):
     __doc__ = "An endpoint for changing password."
 
     @swagger_auto_schema(tags=["Users"])
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         self.object = self.request.user
         serializer = self.get_serializer(data=request.data)
 

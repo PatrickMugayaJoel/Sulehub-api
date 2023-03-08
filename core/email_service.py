@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
+from django.http import HttpRequest
 import threading
 
 from custom_logger import CustomLogger
@@ -30,7 +31,7 @@ def send_email(**kargs):
     try:
         email_from = settings.EMAIL_HOST_USER
         email = EmailMessage(subject, message, email_from, recipient_list, bcc_list,
-            reply_to=[request.user.email, settings.EMAIL_HOST_USER,],
+            reply_to=["noreply@shulehub.com",],
             headers={},
         )
         email.content_subtype = "html"
@@ -38,4 +39,6 @@ def send_email(**kargs):
         thread.start()
     except Exception as e:
         print("ERROR: ",e)
+        if not request:
+            request = HttpRequest() # TODO: Add some infor to the request
         custom_logger.log_error("EMAIL", str(e), request, "send_email")

@@ -18,9 +18,94 @@ from .serializers import (
         TeachersSerializer,
         TeachersUpdateSerializer,
         StudentsSerializer,
-        StudentsUpdateSerializer
+        StudentsUpdateSerializer,
+        LevelUpdateSerializer,
+        LevelSerializer
 )
 
+
+#############################################
+## Levels
+#############################################
+class ListLevelsView(APIView):
+    serializer_class = LevelSerializer
+    permission_classes = (IsAuthenticated,)
+
+    @swagger_auto_schema(tags=["Schools"])
+    def get(self, request, school_id):
+        __doc__ = "List all Levels."
+        try:
+            levels = Level.objects.filter(school=school_id)
+            data = json.loads(serializers.serialize('json', levels, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class GetLevelView(APIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = Level.objects.all()
+    serializer_class = LevelSerializer
+
+    __doc__ = "GET API for level"
+
+    @swagger_auto_schema(tags=["Schools"])
+    def get(self, request, level_id=None):
+        try:
+            level = self.queryset.get(pk=int(level_id))
+            data = json.loads(serializers.serialize('json', [level,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class AddLevelView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    __doc__ = "Create API for level"
+
+    @swagger_auto_schema(
+        operation_description="Create API for level",
+        request_body=LevelSerializer,
+        tags=["Schools"]
+    )
+    def post(self, request):
+        try:
+            level_serializer = LevelSerializer(data=request.data)
+            if level_serializer.is_valid():
+                level = teacher_serializer.validated_data
+                if not level.school.manager == request.user:
+                    return Response({'status': False, 'message': "Permission to add levels is reserved for the school's manager!"},
+                                    status=status.HTTP_401_UNAUTHORIZED)
+                level_serializer.save()
+                data = json.loads(serializers.serialize('json', [level_serializer,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+                return Response({'status': True, 'message': data}, status.HTTP_201_CREATED)
+            else:
+                return Response({'status': False, 'message': ','.join(level_serializer.errors.values())}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateLevelView(APIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = Level.objects.all()
+    serializer_class = LevelUpdateSerializer
+
+    __doc__ = "Profile Update API for level"
+
+    @swagger_auto_schema(request_body=SubjectSerializer,tags=["Schools"],)
+    def put(self, request, level_id=None):
+        try:
+            level = self.queryset.get(pk=int(level_id))
+            if not level.school.manager == request.user:
+                return Response({'status': False, 'message': "Permission to perform action denied"},
+                                status=status.HTTP_401_UNAUTHORIZED)
+            level_serializer = self.serializer_class(level, data=request.data)
+            if level_serializer.is_valid():
+                level_serializer.save()
+                data = json.loads(serializers.serialize('json', [level_serializer,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+                return Response({'status': True, 'message': data}, status=status.HTTP_200_OK)
+            else:
+                return Response({'status': False, 'message': ','.join(level_serializer.errors.values())}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 #############################################
 ## Subjects

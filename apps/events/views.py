@@ -9,10 +9,10 @@ from apps.utils import JsonEncoder
 import json
 
 # local imports
-from .models import Event
+from .models import Event, Invitation
 from apps.schools.models import School
 from core.email_service import send_email
-from .serializers import EventSerializer, EventUpdateSerializer
+from .serializers import EventSerializer, EventUpdateSerializer, InvitationSerializer
 
 
 class ListEventsView(APIView):
@@ -120,3 +120,16 @@ class UpdateEventView(APIView):
             return Response({'status': False,
                              'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
+
+class ListInvitationsView(APIView):
+    permission_classes = (IsAuthenticated,)
+    __doc__ = "List invitations."
+
+    @swagger_auto_schema(tags=["Schools"])
+    def get(self, request, school_id=0):
+        try:
+            invites = Invitation.objects.filter(school__pk=int(school_id))
+            data = json.loads(serializers.serialize('json', invites, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)

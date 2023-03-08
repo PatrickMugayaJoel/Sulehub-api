@@ -5,7 +5,7 @@ from .models import Event, Invitation
 class InvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
-        # fields = ('id', 'school', 'email', 'user_type', 'is_active', 'created_on')
+        fields = '__all__'
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:

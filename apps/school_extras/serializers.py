@@ -2,8 +2,31 @@
 from __future__ import unicode_literals
 
 from rest_framework import serializers
-from .models import Subject, TeacherRegistration, StudentRegistration
+from .models import Subject, TeacherRegistration, StudentRegistration, Level
 
+
+## Levels
+#############################################
+class LevelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Level
+        fields = '__all__'
+
+class LevelUpdateSerializer(serializers.ModelSerializer):
+
+    def validate(self, data, *args, **kwargs):
+       return super(LevelUpdateSerializer, self).validate(data, *args, **kwargs)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data['name']
+        instance.short_name = validated_data['short_name']
+        instance.is_active = validated_data['is_active']
+        instance.save()
+        return instance
+
+    class Meta:
+        model = Level
+        fields = '__all__'
 
 ## Subjects
 #############################################

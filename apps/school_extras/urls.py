@@ -7,7 +7,10 @@ from .views import (
     ListTeacherStudentsView,
     ListTeacherSubjectsView,
     ## Students
-    ListStudentsView
+    ListStudentsView,
+    ## Levels
+    ListLevelsView,
+    AddLevelView,
 )
 
 app_name = 'subjects'
@@ -23,4 +26,9 @@ urlpatterns = [
 
     ## Students
     path('students/', ListStudentsView.as_view(), name='list_students'),
+
+    ## Levels
+    path('levels/', ListLevelsView.as_view(), name='list_levels'),
+    path('levels/create/', AddLevelView.as_view(), name='levels_create'),
+
 ]

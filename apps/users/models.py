@@ -5,10 +5,8 @@ from django.contrib.auth.models import (
 )
 from django.dispatch import receiver
 from django.db import models
-from django.conf import settings
 from django.utils import timezone
-from django.urls import reverse
-from django.core.mail import send_mail
+from core.email_service import send_email
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from django_rest_passwordreset.signals import reset_password_token_created
@@ -105,11 +103,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
 
-    email_plaintext_message = f"{reverse('password_reset:reset-password-request')}\ntoken={reset_password_token.key}"
+    first_name = reset_password_token.user.first_name
+    if not first_name:
+        first_name = "sir/madam"
 
-    send_mail(
-        "Password Reset for Shulehub", # title
-        email_plaintext_message, # message
-        settings.EMAIL_HOST_USER, # from
-        [reset_password_token.user.email] # to
+    send_email(
+        template="PASSWORD_RESET",
+        TOKEN=reset_password_token.key,
+        FIRST_NAME=first_name,
+        recipient_list=[reset_password_token.user.email,]
     )
