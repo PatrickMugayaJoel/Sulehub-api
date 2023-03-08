@@ -1,7 +1,7 @@
 from django.contrib.auth.models import (
     PermissionsMixin,
     BaseUserManager,
-    AbstractUser,
+    AbstractBaseUser,
 )
 from django.dispatch import receiver
 from django.db import models
@@ -37,14 +37,14 @@ class UserManager(BaseUserManager):
     def get_queryset(self):
         return super(UserManager, self).get_queryset()
 
-    # def get_by_natural_key(self, email):
-    #     return self.get(email=email)
+    def get_by_natural_key(self, email):
+        return self.get(email=email)
 
 class AutoDateTimeField(models.DateTimeField):
     def pre_save(self, model_instance, add):
         return timezone.now()
 
-class User(AbstractUser):
+class User(AbstractBaseUser, PermissionsMixin):
     GENDER = (
         ('M', 'Male'),
         ('F', 'Female'),

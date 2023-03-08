@@ -29,16 +29,16 @@ from apps.events.models import Invitation
 from apps.events.serializers import InvitationSerializer, InvitationCreateSerializer
 
 
-class RegistrationAPIView(APIView):
-    permission_classes = [AllowAny,]
-    serializer_class = UserCreateSerializer
+class AddUserAPIView(APIView):
+    # authentication_classes = []
+    permission_classes = (AllowAny,)
 
     __doc__ = "Registration API for user"
 
     @swagger_auto_schema(tags=["Users"], request_body=UserCreateSerializer)
     def post(self, request, *args, **kwargs):
         try:
-            user_serializer = self.serializer_class(data=request.data)
+            user_serializer = UserCreateSerializer(data=request.data)
             if user_serializer.is_valid():
                 user_serializer.save()
                 data = user_serializer.data
