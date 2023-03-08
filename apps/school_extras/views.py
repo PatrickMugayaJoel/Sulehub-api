@@ -71,15 +71,19 @@ class AddLevelView(APIView):
         try:
             level_serializer = LevelSerializer(data=request.data)
             if level_serializer.is_valid():
-                level = teacher_serializer.validated_data
-                if not level.school.manager == request.user:
+                level = level_serializer.validated_data
+                if not level['school'].manager == request.user:
                     return Response({'status': False, 'message': "Permission to add levels is reserved for the school's manager!"},
                                     status=status.HTTP_401_UNAUTHORIZED)
-                level_serializer.save()
-                data = json.loads(serializers.serialize('json', [level_serializer,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+                level = level_serializer.save()
+                data = json.loads(serializers.serialize('json', [level,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
                 return Response({'status': True, 'message': data}, status.HTTP_201_CREATED)
             else:
-                return Response({'status': False, 'message': ','.join(level_serializer.errors.values())}, status=status.HTTP_400_BAD_REQUEST)
+                message = ''
+                for error in level_serializer.errors.values():
+                    message += " "
+                    message += error[0]
+                return Response({'status': False, 'message': message}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -90,7 +94,7 @@ class UpdateLevelView(APIView):
 
     __doc__ = "Profile Update API for level"
 
-    @swagger_auto_schema(request_body=SubjectSerializer,tags=["Schools"],)
+    @swagger_auto_schema(request_body=LevelUpdateSerializer,tags=["Schools"],)
     def put(self, request, level_id=None):
         try:
             level = self.queryset.get(pk=int(level_id))
@@ -100,10 +104,14 @@ class UpdateLevelView(APIView):
             level_serializer = self.serializer_class(level, data=request.data)
             if level_serializer.is_valid():
                 level_serializer.save()
-                data = json.loads(serializers.serialize('json', [level_serializer,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+                data = json.loads(serializers.serialize('json', [level,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
                 return Response({'status': True, 'message': data}, status=status.HTTP_200_OK)
             else:
-                return Response({'status': False, 'message': ','.join(level_serializer.errors.values())}, status=status.HTTP_400_BAD_REQUEST)
+                message = ''
+                for error in level_serializer.errors.values():
+                    message += " "
+                    message += error[0]
+                return Response({'status': False, 'message': message}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -119,13 +127,10 @@ class ListSubjectsView(APIView):
         __doc__ = "List all subjects."
         try:
             subjects = Subject.objects.filter(level__school=school_id)
-            subject_serializer = self.serializer_class(subjects, many=True)
-            return Response({'status': True,
-                             'Response': subject_serializer.data},
-                            status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', subjects, use_natural_foreign_keys=True, cls=JsonEncoder))
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False, 'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetSubjectView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -138,9 +143,8 @@ class GetSubjectView(APIView):
     def get(self, request, subject_id=None):
         try:
             subject = self.queryset.get(pk=int(subject_id))
-            subject_serializer = self.serializer_class(subject, many=False)
-            return Response({'status': True,
-                             'Response': subject_serializer.data}, status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', [subject,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False,
                              'message': str(e)},
@@ -158,15 +162,13 @@ class AddSubjectView(APIView):
     )
     def post(self, request):
         try:
-            if not request.data.get("name"):
-                raise Exception('"Name" field required.')
             level = get_object_or_404(Level, pk=int(request.data.get("level")))
             if not level.school.manager == request.user:
                 return Response({'status': False, 'message': "Permission to add subjects is reserved for the school's manager!"},
                                 status=status.HTTP_401_UNAUTHORIZED)
-            level.subject_set.create(name=request.data.get("name"), description=request.data.get("description"))
-            subjects = SubjectSerializer(Subject.objects.all(), many=True)
-            return Response({'status': True, 'message': subjects.data}, status.HTTP_201_CREATED)
+            subject = level.subject_set.create(name=request.data.get("name"), description=request.data.get("description"))
+            subject_serializer = SubjectSerializer(subject, many=False)
+            return Response({'status': True, 'message': subject_serializer.data}, status.HTTP_201_CREATED)
         except Exception as e:
             return Response({'status': False,
                              'message': str(e)},
@@ -180,10 +182,10 @@ class UpdateSubjectView(APIView):
     __doc__ = "Profile Update API for subject"
 
     @swagger_auto_schema(request_body=SubjectSerializer,tags=["Subjects"],)
-    def put(self, request, subject_id=None):
+    def put(self, request, subject_id=0):
         try:
             subject = self.queryset.get(pk=int(subject_id))
-            if not subject.school.manager == request.user:
+            if not subject.level.school.manager == request.user:
                 return Response({'status': False, 'message': "Permission to perform action denied"},
                                 status=status.HTTP_401_UNAUTHORIZED)
             subject_serializer = self.serializer_class(subject, data=request.data)
@@ -212,18 +214,11 @@ class ListTeacherStudentsView(APIView):
     __doc__ = "List a Teacher's sudents in a specific school."
 
     @swagger_auto_schema(tags=["Teachers"])
-    def get(self, request, school_id, teacher_reg_id):
+    def get(self, request, teacher_reg_id):
         try:
-            teacher_reg_obj = TeacherRegistration.objects.get(pk=int(teacher_reg_id), school=int(school_id))
-            taught_levels = set()
+            t_reg_obj = TeacherRegistration.objects.get(pk=int(teacher_reg_id))
             taught_students = set()
-            for subject in teacher_reg_obj.subjects.all():
-                taught_levels.add(subject.level)
-
-            school_students = StudentRegistration.objects.filter(school=school_id)
-            for level in taught_levels:
-                taught_students.update(school_students.filter(level=level))
-
+            taught_students.update(StudentRegistration.objects.filter(subjects__in=t_reg_obj.subjects.all()))
             data = json.loads(serializers.serialize('json', taught_students, use_natural_foreign_keys=True, cls=JsonEncoder))
             return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -235,9 +230,9 @@ class ListTeacherSubjectsView(APIView):
     __doc__ = "List a Teacher's subjects in a specific school."
 
     @swagger_auto_schema(tags=["Teachers"])
-    def get(self, request, school_id, teacher_reg_id):
+    def get(self, request, teacher_reg_id):
         try:
-            teacher_reg_obj = TeacherRegistration.objects.get(pk=int(teacher_reg_id), school=int(school_id))
+            teacher_reg_obj = TeacherRegistration.objects.get(pk=int(teacher_reg_id))
             data = json.loads(serializers.serialize('json', teacher_reg_obj.subjects.all(),
                                                     use_natural_foreign_keys=True, cls=JsonEncoder))
             return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
@@ -301,7 +296,7 @@ class AddTeacherView(APIView):
             teacher_serializer = TeachersSerializer(data=request.data)
             if teacher_serializer.is_valid():
                 data = teacher_serializer.validated_data
-                if not data['teacher'].role.lower() == "teacher":
+                if not data['teacher'].role.lower() in ["t", "teacher"]:
                     raise Exception("User being registered is not a 'teacher'")
                 if not data['school'].manager == request.user:
                     return Response({'status': False, 'message': "Permission to perform action denied"},
@@ -327,7 +322,7 @@ class ListStudentsView(APIView):
     @swagger_auto_schema(tags=["Students"])
     def get(self, request, school_id):
         try:
-            students = StudentRegistration.objects.filter(school=school_id, is_active=True)
+            students = StudentRegistration.objects.filter(school=school_id)
             data = json.loads(serializers.serialize('json', students, use_natural_foreign_keys=True, cls=JsonEncoder))
             return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -346,23 +341,18 @@ class ListStudentsRegistrationsView(APIView):
         except Exception as e:
             return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class ListStudentSubjectsView(APIView):
+class GetStudentRegistrationView(APIView):
     permission_classes = (IsAuthenticated,)
-    __doc__ = "List a Student's subjects in a specific school."
+    __doc__ = "Get Student Registration Details."
 
     @swagger_auto_schema(tags=["Students"])
     def get(self, request, reg_id):
         try:
             student_reg_obj = StudentRegistration.objects.get(pk=int(reg_id))
-            if not (student_reg_obj and student_reg_obj.is_active):
-                return Response({'status': True, 'Response': []}, status=status.HTTP_200_OK)
-            subject_serializer = SubjectSerializer(student_reg_obj.subjects, many=True)
-            return Response({'status': True,
-                             'Response': subject_serializer.data},
-                            status=status.HTTP_200_OK)
+            data = json.loads(serializers.serialize('json', [student_reg_obj,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+            return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False, 'message': str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class AddStudentView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -374,14 +364,11 @@ class AddStudentView(APIView):
             student_serializer = StudentsSerializer(data=request.data)
             if student_serializer.is_valid():
                 data = student_serializer.validated_data
-                teacher_regs = TeacherRegistration.objects.filter(school=data['school'])
-                teachers = [data['school'].manager, ]
-                for reg in teacher_regs:
-                    if reg.is_active:
-                        teachers.append(reg.teacher)
-                if not request.user in teachers:
+                if not request.user == data['school'].manager:
                     return Response({'status': False, 'message': "Permission to perform action denied"},
                                     status=status.HTTP_401_UNAUTHORIZED)
+                if not data['level'].school == data['school']:
+                    raise Exception("Level not found in selected school!")
                 student_serializer.save()
                 return Response({'status': True, 'message': student_serializer.data}, status=status.HTTP_201_CREATED)
             else:

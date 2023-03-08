@@ -1,7 +1,7 @@
 from django.contrib.auth.models import (
     PermissionsMixin,
     BaseUserManager,
-    AbstractBaseUser,
+    AbstractUser,
 )
 from django.dispatch import receiver
 from django.db import models
@@ -44,7 +44,7 @@ class AutoDateTimeField(models.DateTimeField):
     def pre_save(self, model_instance, add):
         return timezone.now()
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractUser):
     GENDER = (
         ('M', 'Male'),
         ('F', 'Female'),
@@ -79,6 +79,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
     class Meta:
         ordering = ['first_name']

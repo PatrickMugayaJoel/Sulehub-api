@@ -66,16 +66,16 @@ class CreateStudyGroupView(APIView):
         try:
             study_group_serializer = StudyGroupSerializer(data=request.data)
             if study_group_serializer.is_valid():
-                study_group_serializer.save()
+                study_group = study_group_serializer.save()
+                SG_Reg = GroupRegistration(student=study_group.created_by, study_group=study_group)
+                SG_Reg.save()
                 return Response({'status': True, 'message': study_group_serializer.data}, status=status.HTTP_200_OK)
             else:
                 message = ''
                 for error in study_group_serializer.errors.values():
                     message += " "
                     message += error[0]
-                return Response({'status': False,
-                                 'message': message},
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response({'status': False, 'message': message}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'status': False,
                              'message': str(e)},
@@ -155,9 +155,9 @@ class UpdateRegistrationView(APIView):
     def put(self, request, member_id=None):
         try:
             study_group_reg = GroupRegistration.objects.get(pk=int(member_id))
-            if not ((study_group_reg.study_group.created_by == request.user) or (request.user == study_group_reg.student)):
-                return Response({'status': False, 'message': "Permission to perform action denied"},
-                                status=status.HTTP_401_UNAUTHORIZED)
+            # if not ((study_group_reg.study_group.created_by == request.user) or (request.user == study_group_reg.student)):
+            #     return Response({'status': False, 'message': "Permission to perform action denied"},
+            #                     status=status.HTTP_401_UNAUTHORIZED)
             study_group_reg_serializer = GroupRegistrationUpdateSerializer(study_group_reg, data=request.data)
             if study_group_reg_serializer.is_valid():
                 study_group_reg_serializer.save()

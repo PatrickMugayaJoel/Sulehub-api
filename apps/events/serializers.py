@@ -7,11 +7,16 @@ class InvitationSerializer(serializers.ModelSerializer):
         model = Invitation
         fields = '__all__'
 
+class InvitationCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invitation
+        fields = ('email', 'user_type', 'school',)
+
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('id', 'name', 'school', 'tags', 'description', 'expires_on', 'created_on', 'created_by')
-        extra_kwargs = {'created_on':{'read_only':True},'created_by':{'read_only':True},}
+        extra_kwargs = {'created_on':{'read_only':True},}
 
 class EventUpdateSerializer(serializers.ModelSerializer):
 

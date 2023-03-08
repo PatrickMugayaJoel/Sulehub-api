@@ -47,7 +47,7 @@ class CreateResourceView(APIView):
     @swagger_auto_schema(request_body=ResourceSerializer, tags=["Resources"])
     def post(self, request):
         try:
-            if not "teacher" == request.user.role.lower():
+            if not request.user.role.lower() in ["teacher","t"]:
                 return Response({'status': False, 'message': "Action only allowed for role 'teacher'"},
                                 status=status.HTTP_401_UNAUTHORIZED)
             resource_serializer = ResourceSerializer(data=request.data)

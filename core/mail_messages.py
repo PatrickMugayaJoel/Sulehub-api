@@ -17,9 +17,9 @@ def messages(template, kargs):
         },
         "INVITE_A_USER":{
             "subject":f"Shulehub:- Initation to join {kargs.get('SCHOOL_NAME')}",
-            "message":f"""Dear sir/madam,<br/><br/> You are invited to join ({kargs.get("SCHOOL_NAME")}) as a {kargs.get('USER_TYPE')}.
+            "message":f"""Dear sir/madam,<br/><br/> You are invited to join {kargs.get("SCHOOL_NAME")} as a {kargs.get('USER_TYPE')}.
                 <br/><br/>To proceed, click the link below and Signup/Login to Shulehub and accept the invitation.<br/><br/>
-                {os.environ.get('FRONTEND_DOMAIN')}{os.environ.get('FRONTEND_INVITE_URL')}/({kargs.get("INVITE_ID")}) <br/><br/>
+                {os.environ.get('FRONTEND_DOMAIN')}{os.environ.get('FRONTEND_INVITE_URL')}/{kargs.get("INVITE_ID")} <br/><br/>
                 --- ShuleHub Mngt ---"""
         },
         "PASSWORD_RESET":{

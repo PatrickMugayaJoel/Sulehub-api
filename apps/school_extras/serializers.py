@@ -15,7 +15,7 @@ class LevelSerializer(serializers.ModelSerializer):
 class LevelUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, data, *args, **kwargs):
-       return super(LevelUpdateSerializer, self).validate(data, *args, **kwargs)
+        return super(LevelUpdateSerializer, self).validate(data, *args, **kwargs)
 
     def update(self, instance, validated_data):
         instance.name = validated_data['name']
@@ -26,7 +26,7 @@ class LevelUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Level
-        fields = '__all__'
+        fields = ('name', 'short_name', 'is_active',)
 
 ## Subjects
 #############################################
