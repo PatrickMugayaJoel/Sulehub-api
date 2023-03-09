@@ -26,7 +26,7 @@ from .serializers import (
 from core.upload_service import upload
 from core.email_service import send_email
 from apps.events.models import Invitation
-from apps.events.serializers import InvitationSerializer, InvitationCreateSerializer
+from apps.events.serializers import InvitationSerializer, InvitationCreateSerializer, InviteUpdateSerializer
 
 
 class AddUserAPIView(APIView):
@@ -100,6 +100,28 @@ class GetInvitationView(APIView):
             return Response({'status': True, 'Response': data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'status': False, 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateInvitationView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    __doc__ = "Invitation Update view"
+
+    @swagger_auto_schema(tags=["Users"], request_body=InviteUpdateSerializer)
+    def put(self, request, invite_id=0):
+        try:
+            invite = Invitation.objects.get(pk=int(invite_id))
+            if isinstance(request.data.get("is_active"), bool):
+                invite.is_active = request.data.get("is_active")
+                invite.save()
+                data = json.loads(serializers.serialize('json', [invite,], use_natural_foreign_keys=True, cls=JsonEncoder))[0]
+                return Response(data, status=status.HTTP_200_OK)
+            else:
+                return Response({'status': False, 'message': "invalid input!"},
+                                status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'status': False,
+                             'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 class GetUserAPIView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -185,15 +207,14 @@ class UserDPUploadView(APIView):
 class UpdateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     model = User
-    serializer_class = UserUpdateSerializer
 
     __doc__ = "Profile Update API for user"
 
-    @swagger_auto_schema(tags=["Users"])
+    @swagger_auto_schema(tags=["Users"], request_body=UserUpdateSerializer)
     def put(self, request, *args, **kwargs):
         try:
             user = self.request.user
-            user_serializer = self.serializer_class(user, data=request.data)
+            user_serializer = UserUpdateSerializer(user, data=request.data)
             if user_serializer.is_valid():
                 user_serializer.save()
                 return Response(user_serializer.data, status=status.HTTP_200_OK)
@@ -211,24 +232,22 @@ class UpdateAPIView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
 class ChangePasswordView(APIView):
-    serializer_class = ChangePasswordSerializer
-    model = User
     permission_classes = (IsAuthenticated,)
 
     __doc__ = "An endpoint for changing password."
 
     @swagger_auto_schema(tags=["Users"], request_body=ChangePasswordSerializer)
     def post(self, request, *args, **kwargs):
-        self.object = self.request.user
-        serializer = self.get_serializer(data=request.data)
+        user = self.request.user
+        serializer = ChangePasswordSerializer(data=request.data)
 
         if serializer.is_valid():
             # Check old password
-            if not self.object.check_password(serializer.data.get("old_password")):
+            if not user.check_password(serializer.data.get("old_password")):
                 return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
             # set_password also hashes the password that the user will get
-            self.object.set_password(serializer.data.get("new_password"))
-            self.object.save()
+            user.set_password(serializer.data.get("new_password"))
+            user.save()
 
             return Response({'status': True,
                 'message': 'Password updated successfully'

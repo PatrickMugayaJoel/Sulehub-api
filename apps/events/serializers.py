@@ -35,3 +35,8 @@ class EventUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('name', 'school', 'description', 'tags', 'expires_on')
+
+class InviteUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invitation
+        fields = ('is_active',)
