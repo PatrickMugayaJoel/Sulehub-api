@@ -15,7 +15,7 @@ def upload(request, path, _type):
     file_obj = request.FILES['file']
     content_type = magic.from_buffer(file_obj.read(), mime=True)
     accepted_types = {
-        "image": ["image/png", "image/tiff", "image/jpeg", "image/gif"],
+        "image": ["image/png", "image/tiff", "image/jpeg", "image/gif", "image/webp"],
         "document": [
             "text/richtext", "text/plain", "application/vnd.ms-excel", "application/msword"
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
