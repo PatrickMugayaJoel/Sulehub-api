@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.http import HttpRequest
-import threading
+# import threading
 
 from custom_logger import CustomLogger
 from core.mail_messages import messages
@@ -35,8 +35,9 @@ def send_email(**kargs):
             headers={},
         )
         email.content_subtype = "html"
-        thread = threading.Thread(target=email.send, args=[])
-        thread.start()
+        email.send()
+        # thread = threading.Thread(target=email.send, args=[])
+        # thread.start()
     except Exception as e:
         print("ERROR: ",e)
         if not request:
