@@ -2,6 +2,11 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 
+def resource_file_dir_path(instance, filename):
+    return f'user_{instance.user.id}/resources/files/%Y/%m/%d/{instance.id}_{filename}'
+
+def resource_pic_dir_path(instance, filename):
+    return f'user_{instance.user.id}/resources/image/%Y/%m/%d/{instance.id}_{filename}'
 
 class Resource(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -10,8 +15,8 @@ class Resource(models.Model):
     tags = models.CharField(max_length=150, blank=True)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=False)
-    image = models.CharField(max_length=100, blank=True)
-    _file = models.CharField(max_length=100, blank=True)
+    image = models.ImageField(upload_to=resource_pic_dir_path, blank=True, null=True)
+    _file = models.FileField(upload_to=resource_file_dir_path, blank=True, null=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, to_field='id', on_delete=models.CASCADE)
     created_on = models.DateTimeField(default=timezone.now)
 

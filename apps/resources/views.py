@@ -135,21 +135,12 @@ class ResourceFileUploadView(APIView):
             if not resource.created_by == request.user:
                 return Response({'status': False, 'message': "Permission to perform action denied"},
                                 status=status.HTTP_401_UNAUTHORIZED)
-            if not request.FILES.get('file'):
-                raise ObjectDoesNotExist("'Request File' object is empty")
-            filepath = "uploads/files/resources/" + str(request.FILES['file'])
-            result = upload(request, filepath, "document")
-            if result["status"]:
-                resource._file=filepath
-                resource.is_active=True
-                resource.save()
-                return Response({'status': True,
-                                'message': "file successfully uploaded",
-                                'path':filepath},
-                                status=status.HTTP_200_OK)
-            else:
-                raise Exception(result["message"])
+            resource._file=request.FILES['file']
+            # FilePathField.match
+            # FieldFile.size
+            resource.save()
+            return Response({'status': True, 'message': "file successfully uploaded"},
+                            status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'status': False,
-                            'message': str(e),},
+            return Response({'status': False, 'message': str(e),},
                             status=status.HTTP_400_BAD_REQUEST)

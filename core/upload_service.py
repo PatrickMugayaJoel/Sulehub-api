@@ -1,5 +1,5 @@
 
-## for expiring download, see: https://github.com/yunojuno/django-request-token
+## for expiring urls, see: https://github.com/yunojuno/django-request-token
 
 import os
 import magic
@@ -32,10 +32,10 @@ def upload(request, path, _type):
     try:
         _file = os.path.join(settings.STATICFILES_DIRS[0], path)
         path = default_storage.save(_file, content=file_obj)
-        # destination = open(_file, 'wb+')
-        # for chunk in file_obj.chunks():
+        ## Looping over UploadedFile.chunks() instead of using read() ensures that large files don’t overwhelm your system’s memory.
+        # with open(_file, 'wb+') as destination:
+        #   for chunk in file_obj.chunks():
         #     destination.write(chunk)
-        # destination.close()
         return {"status": True, "message": "File Uploaded successfully"}
     except Exception as e:
         print("ERROR: ",e)
